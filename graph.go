@@ -1,6 +1,7 @@
 package kraken
 
 import (
+	"errors"
 	"fmt"
 	"unsafe"
 
@@ -49,6 +50,21 @@ func (g *Graph) DeleteNode(n *Node) {
 // CountNodes returns the total number of nodes in the graph
 func (g *Graph) CountNodes() int {
 	return len(g.Nodes)
+}
+
+// GetNode tries to find a node based on an ID.
+func (g *Graph) GetNode(id string) (n *Node, err error) {
+	uid, err := uuid.FromString(id)
+	if err != nil {
+		return nil, err
+	}
+
+	for elem := range g.Nodes {
+		if elem.ID == uid {
+			return elem, nil
+		}
+	}
+	return nil, errors.New("no node found")
 }
 
 // SaveToDisk writes the content of this graph to disk.
