@@ -3,6 +3,7 @@ package kraken
 import (
 	"fmt"
 	"math/rand"
+	"unsafe"
 )
 
 // Graph holding the entire graph network.
@@ -24,8 +25,11 @@ func (g *Graph) Inspect() {
 
 // Size of this Graph struct.
 func (g *Graph) Size() int {
-	// TODO: Compute size
-	size := -1
+	size := int(unsafe.Sizeof(g.ID))
+	size = len(g.Name)
+	for elem := range g.Nodes {
+		size += elem.Size()
+	}
 	return size
 }
 

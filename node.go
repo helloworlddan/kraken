@@ -3,6 +3,7 @@ package kraken
 import (
 	"fmt"
 	"math/rand"
+	"unsafe"
 )
 
 // Node in a graph.
@@ -22,8 +23,8 @@ func (n *Node) Inspect() {
 
 // Size of this Node struct.
 func (n *Node) Size() int {
-	// TODO: Compute size
-	size := -1
+	size := int(unsafe.Sizeof(n.ID))
+	size += len(n.Name)
 	return size
 }
 
