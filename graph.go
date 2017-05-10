@@ -2,20 +2,21 @@ package kraken
 
 import (
 	"fmt"
-	"math/rand"
 	"unsafe"
+
+	"github.com/satori/go.uuid"
 )
 
 // Graph holding the entire graph network.
 type Graph struct {
-	ID    int64
+	ID    uuid.UUID
 	Name  string
 	Nodes map[*Node]bool
 }
 
 // Inspect this graph.
 func (g *Graph) Inspect() {
-	fmt.Printf("ID:\t\t%d\n", g.ID)
+	fmt.Printf("ID:\t\t%s\n", g.ID)
 	fmt.Printf("Type:\t\tGraph\n")
 	fmt.Printf("Name:\t\t%s\n", g.Name)
 	fmt.Printf("Size:\t\t%d\n", g.Size())
@@ -66,7 +67,7 @@ func LoadFromDisk(name string) *Graph {
 // NewGraph creates a brand new graph
 func NewGraph(name string) *Graph {
 	return &Graph{
-		ID:    rand.Int63(),
+		ID:    uuid.NewV4(),
 		Name:  name,
 		Nodes: make(map[*Node]bool),
 	}
