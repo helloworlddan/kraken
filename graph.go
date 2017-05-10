@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"unsafe"
 
+	"gopkg.in/yaml.v2"
+
+	"io/ioutil"
+
 	"github.com/satori/go.uuid"
 )
 
@@ -68,16 +72,38 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 }
 
 // SaveToDisk writes the content of this graph to disk.
-func (g *Graph) SaveToDisk() bool {
-	// TODO: Write to disk
-	return false
+func (g *Graph) SaveToDisk() (err error) {
+	fileName := g.Name + ".kraken"
+
+	y, err := yaml.Marshal(g)
+	if err != nil {
+		return err
+	}
+	data := []byte(string(y))
+
+	err = ioutil.WriteFile(fileName, data, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // LoadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
-func LoadFromDisk(name string) *Graph {
-	// TODO: Load from Disk
-	return nil
+func LoadFromDisk(name string) (g *Graph, err error) {
+	fileName := name + ".kraken"
+
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	var gra Graph
+	err = yaml.Unmarshal(data, &gra)
+	if err != nil {
+		return nil, err
+	}
+	return &gra, nil
 }
 
 // NewGraph creates a brand new graph
