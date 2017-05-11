@@ -1,6 +1,7 @@
 package kraken
 
 import (
+	"errors"
 	"fmt"
 	"time"
 	"unsafe"
@@ -14,6 +15,7 @@ type Node struct {
 	Created  time.Time
 	Modified time.Time
 	Name     string
+	Data     map[string]string
 }
 
 // Inspect this node.
@@ -24,6 +26,10 @@ func (n *Node) Inspect() {
 	fmt.Printf("Created:\t%s\n", n.Created.Format(TimeFormat))
 	fmt.Printf("Modified:\t%s\n", n.Modified.Format(TimeFormat))
 	fmt.Printf("Size:\t\t%d\n", n.Size())
+	fmt.Printf("Data:\n")
+	for k, v := range n.Data {
+		fmt.Printf("\t%s => %s\n", k, v)
+	}
 	fmt.Printf("\n")
 }
 
@@ -31,7 +37,42 @@ func (n *Node) Inspect() {
 func (n *Node) Size() int {
 	size := int(unsafe.Sizeof(n.ID))
 	size += len(n.Name)
+	for k, v := range n.Data {
+		size += len(k)
+		size += len(v)
+	}
 	return size
+}
+
+// PutData into a Node. Will always modify.
+func (n *Node) PutData(key string, value string) {
+	n.Data[key] = value
+	n.Modified = time.Now()
+}
+
+// DropData from a Node. Do nothing if the item is not found.
+func (n *Node) DropData(key string) {
+	for k := range n.Data {
+		if k == key {
+			delete(n.Data, key)
+			n.Modified = time.Now()
+		}
+	}
+}
+
+// CountData returns the total number of data items in a Node.
+func (n *Node) CountData() int {
+	return len(n.Data)
+}
+
+// GetData tries to find a data item based on its key.
+func (n *Node) GetData(key string) (value string, err error) {
+	for k, v := range n.Data {
+		if k == key {
+			return v, nil
+		}
+	}
+	return "", errors.New("key not found")
 }
 
 // NewNode creates a brand new node
@@ -40,6 +81,7 @@ func NewNode(name string) *Node {
 		Created:  time.Now(),
 		ID:       uuid.NewV4(),
 		Name:     name,
+		Data:     make(map[string]string),
 		Modified: time.Now(),
 	}
 }
