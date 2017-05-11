@@ -9,7 +9,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var e *Engine
+// E Globally running Engine.
+var E *Engine
 
 func graph(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -17,7 +18,7 @@ func graph(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		g, err := e.FindGraph(name)
+		g, err := E.FindGraph(name)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -35,19 +36,30 @@ func graph(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func engine(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		y, err := E.ToYaml()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, y)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+}
+
 //Start the service.
 func Start() {
 
-	e = NewEngine()
-
-	// TODO: Load all found graphs
-	g, err := LoadFromDisk("Flights")
-	if err != nil {
-		log.Println(err)
-	}
-	e.AddGraph(g)
+	E = NewEngine()
+	E.LoadDirectory(DefaultStore)
 
 	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)
 
 	log.Fatal(http.ListenAndServe(Host+":"+strconv.Itoa(Port), router))

@@ -11,3 +11,8 @@ const Host string = ""
 // Port of the server to listen to.
 const Port int = 8000
 
+// DefaultStore is the path for default storage
+const DefaultStore string = "./"
+
+// FileSuffix is the suffix for storage files
+const FileSuffix string = ".kraken"

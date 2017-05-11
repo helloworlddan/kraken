@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"time"
 
+	"strings"
+
 	"github.com/satori/go.uuid"
+	"gopkg.in/yaml.v2"
 )
 
 // Engine holding all Graphs.
@@ -50,6 +53,15 @@ func (e *Engine) FindGraph(name string) (g *Graph, err error) {
 	return nil, errors.New("graph not found")
 }
 
+// ToYaml transforms the content of this Engine to yaml.
+func (e *Engine) ToYaml() (y string, er error) {
+	yam, err := yaml.Marshal(e)
+	if err != nil {
+		return "", err
+	}
+	return string(yam), nil
+}
+
 // AddGraph to Engine.
 func (e *Engine) AddGraph(g *Graph) {
 	e.Graphs[g] = true
@@ -65,10 +77,10 @@ func (e *Engine) CountGraphs() int {
 	return len(e.Graphs)
 }
 
-// SaveToDisk writes the content of this graph to disk.
-func SaveToDisk(g *Graph) error {
+// WriteToDisk writes the content of this graph to disk.
+func WriteToDisk(g *Graph) error {
 	g.Saved = time.Now()
-	fileName := g.Name + ".kraken"
+	fileName := g.Name + FileSuffix
 
 	y, err := g.ToYaml()
 	if err != nil {
@@ -83,10 +95,26 @@ func SaveToDisk(g *Graph) error {
 	return nil
 }
 
-// LoadFromDisk loads the graph from the disk.
+// LoadDirectory loads all .kraken files in the given directory.
+func (e *Engine) LoadDirectory(path string) error {
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), FileSuffix) {
+			name := strings.TrimSuffix(f.Name(), FileSuffix)
+			g, err := ReadFromDisk(name)
+			if err != nil {
+				return nil
+			}
+			e.AddGraph(g)
+		}
+	}
+	return nil
+}
+
+// ReadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
-func LoadFromDisk(name string) (g *Graph, e error) {
-	fileName := name + ".kraken"
+func ReadFromDisk(name string) (g *Graph, e error) {
+	fileName := name + FileSuffix
 
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
