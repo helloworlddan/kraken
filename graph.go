@@ -3,20 +3,25 @@ package kraken
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"time"
 	"unsafe"
 
-	"gopkg.in/yaml.v2"
-
-	"io/ioutil"
-
 	"github.com/satori/go.uuid"
+	"gopkg.in/yaml.v2"
 )
+
+// TimeFormat defines the default format of all time related data.
+const TimeFormat string = time.RFC3339
 
 // Graph holding the entire graph network.
 type Graph struct {
-	ID    uuid.UUID
-	Name  string
-	Nodes map[*Node]bool
+	ID       uuid.UUID
+	Name     string
+	Created  time.Time
+	Modified time.Time
+	Saved    time.Time
+	Nodes    map[*Node]bool
 }
 
 // Inspect this graph.
@@ -24,6 +29,9 @@ func (g *Graph) Inspect() {
 	fmt.Printf("ID:\t\t%s\n", g.ID)
 	fmt.Printf("Type:\t\tGraph\n")
 	fmt.Printf("Name:\t\t%s\n", g.Name)
+	fmt.Printf("Created:\t%s\n", g.Created.Format(TimeFormat))
+	fmt.Printf("Modified:\t%s\n", g.Modified.Format(TimeFormat))
+	fmt.Printf("Saved:\t\t%s\n", g.Saved.Format(TimeFormat))
 	fmt.Printf("Size:\t\t%d\n", g.Size())
 	fmt.Printf("Nodes:\t\t%d\n", g.CountNodes())
 	fmt.Printf("\n")
@@ -43,12 +51,19 @@ func (g *Graph) Size() int {
 func (g *Graph) AddNode(n *Node) bool {
 	_, found := g.Nodes[n]
 	g.Nodes[n] = true
+	if !found {
+		g.Modified = time.Now()
+	}
 	return !found
 }
 
 // DeleteNode from a graph
 func (g *Graph) DeleteNode(n *Node) {
+	_, found := g.Nodes[n]
 	delete(g.Nodes, n)
+	if found {
+		g.Modified = time.Now()
+	}
 }
 
 // CountNodes returns the total number of nodes in the graph
@@ -73,6 +88,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 
 // SaveToDisk writes the content of this graph to disk.
 func (g *Graph) SaveToDisk() (err error) {
+	g.Saved = time.Now()
 	fileName := g.Name + ".kraken"
 
 	y, err := yaml.Marshal(g)
@@ -109,8 +125,10 @@ func LoadFromDisk(name string) (g *Graph, err error) {
 // NewGraph creates a brand new graph
 func NewGraph(name string) *Graph {
 	return &Graph{
-		ID:    uuid.NewV4(),
-		Name:  name,
-		Nodes: make(map[*Node]bool),
+		Created:  time.Now(),
+		ID:       uuid.NewV4(),
+		Name:     name,
+		Nodes:    make(map[*Node]bool),
+		Modified: time.Now(),
 	}
 }
