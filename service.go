@@ -9,37 +9,26 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// This pointer is holding the graph that is currently loaded to RAM.
-var current *Graph
+var e *Engine
 
 func graph(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["name"]
+	name := vars["graph"]
 
 	switch r.Method {
 	case "GET":
-		g, err := LoadFromDisk(name)
+		g, err := e.FindGraph(name)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
-			io.WriteString(w, "Not found")
 			return
 		}
-		current = g
-		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, g.ID.String())
-	case "PUT":
-		current = NewGraph(name)
-		current.SaveToDisk()
-		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, current.ID.String())
-	case "PATCH":
-		if current == nil {
-			w.WriteHeader(http.StatusNotFound)
-			io.WriteString(w, "Not found")
+		y, err := g.ToYaml()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		current.SaveToDisk()
+		io.WriteString(w, y)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -48,8 +37,18 @@ func graph(w http.ResponseWriter, r *http.Request) {
 
 //Start the service.
 func Start() {
+
+	e = NewEngine()
+
+	// TODO: Load all found graphs
+	g, err := LoadFromDisk("Flights")
+	if err != nil {
+		log.Println(err)
+	}
+	e.AddGraph(g)
+
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/{name}", graph)
+	router.HandleFunc("/{graph}/", graph)
 
 	log.Fatal(http.ListenAndServe(Host+":"+strconv.Itoa(Port), router))
 }

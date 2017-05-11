@@ -3,7 +3,6 @@ package kraken
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"time"
 	"unsafe"
 
@@ -45,13 +44,12 @@ func (g *Graph) Size() int {
 }
 
 // AddNode to a graph.
-func (g *Graph) AddNode(n *Node) bool {
+func (g *Graph) AddNode(n *Node) {
 	_, found := g.Nodes[n]
 	g.Nodes[n] = true
 	if !found {
 		g.Modified = time.Now()
 	}
-	return !found
 }
 
 // DeleteNode from a graph
@@ -80,39 +78,22 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 			return elem, nil
 		}
 	}
-	return nil, errors.New("no node found")
+	return nil, errors.New("node not found")
 }
 
-// SaveToDisk writes the content of this graph to disk.
-func (g *Graph) SaveToDisk() (err error) {
-	g.Saved = time.Now()
-	fileName := g.Name + ".kraken"
-
-	y, err := yaml.Marshal(g)
+// ToYaml transforms the content of this graph to yaml.
+func (g *Graph) ToYaml() (y string, e error) {
+	yam, err := yaml.Marshal(g)
 	if err != nil {
-		return err
+		return "", err
 	}
-	data := []byte(string(y))
-
-	err = ioutil.WriteFile(fileName, data, 0644)
-	if err != nil {
-		return err
-	}
-	return nil
+	return string(yam), nil
 }
 
-// LoadFromDisk loads the graph from the disk.
-// Needs the name of the graph to load.
-func LoadFromDisk(name string) (g *Graph, err error) {
-	fileName := name + ".kraken"
-
-	data, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return nil, err
-	}
-
+// FromYaml recreates Graph from YAML
+func FromYaml(y string) (g *Graph, e error) {
 	var gra Graph
-	err = yaml.Unmarshal(data, &gra)
+	err := yaml.Unmarshal([]byte(y), &gra)
 	if err != nil {
 		return nil, err
 	}

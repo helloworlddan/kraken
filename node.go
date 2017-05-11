@@ -65,8 +65,8 @@ func (n *Node) CountData() int {
 	return len(n.Data)
 }
 
-// GetData tries to find a data item based on its key.
-func (n *Node) GetData(key string) (value string, err error) {
+// FindData tries to find a data item based on its key.
+func (n *Node) FindData(key string) (value string, err error) {
 	for k, v := range n.Data {
 		if k == key {
 			return v, nil
