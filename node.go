@@ -21,8 +21,8 @@ func (n *Node) Inspect() {
 	fmt.Printf("ID:\t\t%s\n", n.ID)
 	fmt.Printf("Type:\t\tNode\n")
 	fmt.Printf("Name:\t\t%s\n", n.Name)
-	fmt.Printf("Created:\t%s\n", n.Created.Format(time.RFC3339))
-	fmt.Printf("Modified:\t%s\n", n.Modified.Format(time.RFC3339))
+	fmt.Printf("Created:\t%s\n", n.Created.Format(TimeFormat))
+	fmt.Printf("Modified:\t%s\n", n.Modified.Format(TimeFormat))
 	fmt.Printf("Size:\t\t%d\n", n.Size())
 	fmt.Printf("\n")
 }

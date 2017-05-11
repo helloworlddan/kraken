@@ -11,9 +11,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// TimeFormat defines the default format of all time related data.
-const TimeFormat string = time.RFC3339
-
 // Graph holding the entire graph network.
 type Graph struct {
 	ID       uuid.UUID
