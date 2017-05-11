@@ -9,30 +9,40 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// This pointer is holding the graph that is currently loaded to RAM.
 var current *Graph
 
 func graph(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 
-	if r.Method == "GET" {
+	switch r.Method {
+	case "GET":
 		g, err := LoadFromDisk(name)
 		if err != nil {
-			// TODO: codes?
+			w.WriteHeader(http.StatusNotFound)
 			io.WriteString(w, "Not found")
 			return
 		}
 		current = g
+		w.WriteHeader(http.StatusOK)
 		io.WriteString(w, g.ID.String())
-	}
-
-	if r.Method == "PUT" {
+	case "PUT":
+		current = NewGraph(name)
+		current.SaveToDisk()
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, current.ID.String())
+	case "PATCH":
 		if current == nil {
-			// TODO: codes?
+			w.WriteHeader(http.StatusNotFound)
 			io.WriteString(w, "Not found")
 			return
 		}
+		w.WriteHeader(http.StatusOK)
 		current.SaveToDisk()
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
 }
 
