@@ -13,6 +13,8 @@ import (
 // E Globally running Engine.
 var E *Engine
 
+// TODO: Redesign all non-exported functions to remove clutter
+
 func engine(w http.ResponseWriter, r *http.Request) {
 	logRequest(r)
 	switch r.Method {
@@ -147,8 +149,9 @@ func Start() {
 	E.LoadDirectory(DefaultStore)
 	log.Println("Loaded " + strconv.Itoa(E.CountGraphs()) + " graph(s).")
 
-	// Start concurrent saving thread
+	// TODO: Start concurrent saving thread
 
+	// ? Maybe StrictSlash are too annoying ?
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)
