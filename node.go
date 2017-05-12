@@ -6,6 +6,8 @@ import (
 	"time"
 	"unsafe"
 
+	yaml "gopkg.in/yaml.v2"
+
 	"github.com/satori/go.uuid"
 )
 
@@ -73,6 +75,15 @@ func (n *Node) FindData(key string) (value string, err error) {
 		}
 	}
 	return "", errors.New("key not found")
+}
+
+// ToYaml transforms the content of this Node to yaml.
+func (n *Node) ToYaml() (y string, e error) {
+	yam, err := yaml.Marshal(n)
+	if err != nil {
+		return "", err
+	}
+	return string(yam), nil
 }
 
 // NewNode creates a brand new node

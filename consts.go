@@ -2,6 +2,12 @@ package kraken
 
 import "time"
 
+// ApplicationName to identify itself
+const ApplicationName string = "Kraken"
+
+// ApplicationVersion current version
+const ApplicationVersion string = "v0.0.1"
+
 // TimeFormat defines the default format of all time related data.
 const TimeFormat string = time.RFC3339
 

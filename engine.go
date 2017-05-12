@@ -77,8 +77,24 @@ func (e *Engine) CountGraphs() int {
 	return len(e.Graphs)
 }
 
+// LoadDirectory loads all .kraken files in the given directory.
+func (e *Engine) LoadDirectory(path string) error {
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), FileSuffix) {
+			name := strings.TrimSuffix(f.Name(), FileSuffix)
+			g, err := e.ReadFromDisk(name)
+			if err != nil {
+				return nil
+			}
+			e.AddGraph(g)
+		}
+	}
+	return nil
+}
+
 // WriteToDisk writes the content of this graph to disk.
-func WriteToDisk(g *Graph) error {
+func (e *Engine) WriteToDisk(g *Graph) error {
 	g.Saved = time.Now()
 	fileName := g.Name + FileSuffix
 
@@ -95,25 +111,9 @@ func WriteToDisk(g *Graph) error {
 	return nil
 }
 
-// LoadDirectory loads all .kraken files in the given directory.
-func (e *Engine) LoadDirectory(path string) error {
-	files, _ := ioutil.ReadDir(path)
-	for _, f := range files {
-		if strings.HasSuffix(f.Name(), FileSuffix) {
-			name := strings.TrimSuffix(f.Name(), FileSuffix)
-			g, err := ReadFromDisk(name)
-			if err != nil {
-				return nil
-			}
-			e.AddGraph(g)
-		}
-	}
-	return nil
-}
-
 // ReadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
-func ReadFromDisk(name string) (g *Graph, e error) {
+func (e *Engine) ReadFromDisk(name string) (g *Graph, er error) {
 	fileName := name + FileSuffix
 
 	data, err := ioutil.ReadFile(fileName)
