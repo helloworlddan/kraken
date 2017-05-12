@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
 	"strings"
@@ -91,6 +92,12 @@ func (e *Engine) LoadDirectory(path string) error {
 		}
 	}
 	return nil
+}
+
+// DeleteFromDisk deletes the database store from disk.
+func (e *Engine) DeleteFromDisk(g *Graph) {
+	fileName := g.Name + FileSuffix
+	os.Remove(fileName)
 }
 
 // WriteToDisk writes the content of this graph to disk.

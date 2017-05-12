@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/satori/go.uuid"
 )
 
 // E Globally running Engine.
@@ -36,11 +37,21 @@ func graph(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		g, err := E.FindGraph(name)
+		uid, err := uuid.FromString(name)
+		if err != nil {
+			g, er := E.FindGraph(name)
+			if er != nil {
+				respond(w, http.StatusNotFound)
+				return
+			}
+			uid = g.ID
+		}
+		g, err := E.GetGraph(uid.String())
 		if err != nil {
 			respond(w, http.StatusNotFound)
 			return
 		}
+
 		y, err := g.ToYaml()
 		if err != nil {
 			respond(w, http.StatusInternalServerError)
@@ -48,6 +59,35 @@ func graph(w http.ResponseWriter, r *http.Request) {
 		}
 		respond(w, http.StatusOK)
 		io.WriteString(w, y)
+	case "POST":
+		g := NewGraph(name)
+		E.AddGraph(g)
+		y, err := g.ToYaml()
+		if err != nil {
+			respond(w, http.StatusInternalServerError)
+			return
+		}
+		respond(w, http.StatusOK)
+		io.WriteString(w, y)
+	case "DELETE":
+		uid, err := uuid.FromString(name)
+		if err != nil {
+			g, er := E.FindGraph(name)
+			if er != nil {
+				respond(w, http.StatusNotFound)
+				return
+			}
+			uid = g.ID
+		}
+		g, err := E.GetGraph(uid.String())
+		if err != nil {
+			respond(w, http.StatusNotFound)
+			return
+		}
+		E.DeleteFromDisk(g)
+		E.DropGraph(g)
+		g = nil
+		respond(w, http.StatusOK)
 	default:
 		respond(w, http.StatusMethodNotAllowed)
 		return
@@ -107,10 +147,11 @@ func Start() {
 	E.LoadDirectory(DefaultStore)
 	log.Println("Loaded " + strconv.Itoa(E.CountGraphs()) + " graph(s).")
 
+	// Start concurrent saving thread
+
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)
 	router.HandleFunc("/{graph}/{id}", node)
-
 	log.Fatal(http.ListenAndServe(Host+":"+strconv.Itoa(Port), router))
 }
