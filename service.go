@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/satori/go.uuid"
@@ -149,9 +150,19 @@ func Start() {
 	E.LoadDirectory(DefaultStore)
 	log.Println("Loaded " + strconv.Itoa(E.CountGraphs()) + " graph(s).")
 
-	// TODO: Start concurrent saving thread
+	// Concurrent auto saving routine
+	go func() {
+		for {
+			num, err := E.WriteAllToDisk()
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println("Wrote " + strconv.Itoa(num) + " graph(s) to disk.")
+			time.Sleep(AutoWriteInterval)
+		}
+	}()
 
-	// ? Maybe StrictSlash are too annoying ?
+	// ? Maybe StrictSlashs are too annoying ?
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)

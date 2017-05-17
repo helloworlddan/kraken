@@ -100,6 +100,16 @@ func (e *Engine) DeleteFromDisk(g *Graph) {
 	os.Remove(fileName)
 }
 
+// WriteAllToDisk saves all Graphs associated with this Engine.
+func (e *Engine) WriteAllToDisk() (numGraps int, er error) {
+	for elem := range e.Graphs {
+		if err := e.WriteToDisk(elem); err != nil {
+			return 0, err
+		}
+	}
+	return len(e.Graphs), nil
+}
+
 // WriteToDisk writes the content of this graph to disk.
 func (e *Engine) WriteToDisk(g *Graph) error {
 	g.Saved = time.Now()
