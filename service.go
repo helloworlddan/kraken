@@ -162,8 +162,7 @@ func Start() {
 		}
 	}()
 
-	// ? Maybe StrictSlashs are too annoying ?
-	router := mux.NewRouter().StrictSlash(true)
+	router := mux.NewRouter().StrictSlash(StrictSlashesInURLs)
 	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)
 	router.HandleFunc("/{graph}/{id}", node)

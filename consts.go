@@ -25,3 +25,6 @@ const FileSuffix string = ".kraken"
 
 // AutoWriteInterval is the duration of the interval for the auto persistent thread.
 const AutoWriteInterval time.Duration = 10 * time.Second
+
+// StrictSlashesInURLs determines whether or not to demand strict slashes in URLs
+const StrictSlashesInURLs bool = true
