@@ -11,7 +11,10 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-// E Globally running Engine.
+// C global Configuration.
+var C *Configuration
+
+// E global Engine.
 var E *Engine
 
 // TODO: Redesign all non-exported functions to remove clutter
@@ -101,13 +104,23 @@ func node(w http.ResponseWriter, r *http.Request) {
 	logRequest(r)
 	vars := mux.Vars(r)
 	name := vars["graph"]
-	id := vars["id"]
+	id := vars["node"]
 
-	g, err := E.FindGraph(name)
+	uid, err := uuid.FromString(name)
+	if err != nil {
+		g, er := E.FindGraph(name)
+		if er != nil {
+			respond(w, http.StatusNotFound)
+			return
+		}
+		uid = g.ID
+	}
+	g, err := E.GetGraph(uid.String())
 	if err != nil {
 		respond(w, http.StatusNotFound)
 		return
 	}
+
 	n, err := g.GetNode(id)
 	if err != nil {
 		respond(w, http.StatusNotFound)
@@ -144,10 +157,13 @@ func logResponse(status int) {
 
 //Start the service.
 func Start() {
-	log.Println("Starting " + ApplicationName + " Version " + ApplicationVersion)
+	// TODO: Load from disk if available
+	C = DefaultConfiguration()
+
+	log.Println("Starting " + C.ApplicationName + " Version " + C.ApplicationVersion)
 	E = NewEngine()
 
-	E.LoadDirectory(DefaultStore)
+	E.LoadDirectory(C.DefaultStore)
 	log.Println("Loaded " + strconv.Itoa(E.CountGraphs()) + " graph(s).")
 
 	// Concurrent auto saving routine
@@ -158,13 +174,13 @@ func Start() {
 				log.Fatal(err)
 			}
 			log.Println("Wrote " + strconv.Itoa(num) + " graph(s) to disk.")
-			time.Sleep(AutoWriteInterval)
+			time.Sleep(C.AutoWriteInterval)
 		}
 	}()
 
-	router := mux.NewRouter().StrictSlash(StrictSlashesInURLs)
+	router := mux.NewRouter().StrictSlash(C.StrictSlashesInURLs)
 	router.HandleFunc("/", engine)
 	router.HandleFunc("/{graph}/", graph)
-	router.HandleFunc("/{graph}/{id}", node)
-	log.Fatal(http.ListenAndServe(Host+":"+strconv.Itoa(Port), router))
+	router.HandleFunc("/{graph}/{node}/", node)
+	log.Fatal(http.ListenAndServe(C.Host+":"+strconv.Itoa(C.Port), router))
 }
