@@ -74,7 +74,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 	}
 
 	for elem := range g.Nodes {
-		if elem.ID == uid {
+		if elem.ID() == uid {
 			return elem, nil
 		}
 	}
