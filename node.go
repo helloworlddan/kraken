@@ -39,6 +39,11 @@ func (n *Node) Name() string {
 	return n.name
 }
 
+// JustModified sets the modification time to now.
+func (n *Node) JustModified() {
+	n.modified = time.Now()
+}
+
 // Inspect this node.
 func (n *Node) Inspect() {
 	fmt.Printf("ID:\t\t%s\n", n.ID())
@@ -68,7 +73,7 @@ func (n *Node) Size() int {
 // PutData into a Node. Will always modify.
 func (n *Node) PutData(key string, value string) {
 	n.data[key] = value
-	n.modified = time.Now()
+	n.JustModified()
 }
 
 // DropData from a Node. Do nothing if the item is not found.
@@ -76,7 +81,7 @@ func (n *Node) DropData(key string) {
 	for k := range n.data {
 		if k == key {
 			delete(n.data, key)
-			n.modified = time.Now()
+			n.JustModified()
 		}
 	}
 }

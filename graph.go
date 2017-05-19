@@ -12,22 +12,57 @@ import (
 
 // Graph holding the entire graph network.
 type Graph struct {
-	ID       uuid.UUID
-	Name     string
-	Created  time.Time
-	Modified time.Time
-	Saved    time.Time
-	Nodes    map[*Node]bool
+	iD       uuid.UUID
+	name     string
+	created  time.Time
+	modified time.Time
+	saved    time.Time
+	nodes    map[*Node]bool
+}
+
+// ID gets the id of this Graph
+func (g *Graph) ID() uuid.UUID {
+	return g.iD
+}
+
+// Name gets the name of this Graph
+func (g *Graph) Name() string {
+	return g.name
+}
+
+// Created gets the created of this Graph
+func (g *Graph) Created() time.Time {
+	return g.created
+}
+
+// Modified gets the modified of this Graph
+func (g *Graph) Modified() time.Time {
+	return g.modified
+}
+
+// Saved gets the saved of this Graph
+func (g *Graph) Saved() time.Time {
+	return g.saved
+}
+
+// JustModified sets the modification time to now.
+func (g *Graph) JustModified() {
+	g.modified = time.Now()
+}
+
+// JustSaved sets the saving time to now.
+func (g *Graph) JustSaved() {
+	g.saved = time.Now()
 }
 
 // Inspect this graph.
 func (g *Graph) Inspect() {
-	fmt.Printf("ID:\t\t%s\n", g.ID)
+	fmt.Printf("ID:\t\t%s\n", g.ID())
 	fmt.Printf("Type:\t\tGraph\n")
-	fmt.Printf("Name:\t\t%s\n", g.Name)
-	fmt.Printf("Created:\t%s\n", g.Created.Format(C.TimeFormat()))
-	fmt.Printf("Modified:\t%s\n", g.Modified.Format(C.TimeFormat()))
-	fmt.Printf("Saved:\t\t%s\n", g.Saved.Format(C.TimeFormat()))
+	fmt.Printf("Name:\t\t%s\n", g.Name())
+	fmt.Printf("Created:\t%s\n", g.Created().Format(C.TimeFormat()))
+	fmt.Printf("Modified:\t%s\n", g.Modified().Format(C.TimeFormat()))
+	fmt.Printf("Saved:\t\t%s\n", g.Saved().Format(C.TimeFormat()))
 	fmt.Printf("Size:\t\t%d\n", g.Size())
 	fmt.Printf("Nodes:\t\t%d\n", g.CountNodes())
 	fmt.Printf("\n")
@@ -36,8 +71,8 @@ func (g *Graph) Inspect() {
 // Size of this Graph struct.
 func (g *Graph) Size() int {
 	size := int(unsafe.Sizeof(g.ID))
-	size = len(g.Name)
-	for elem := range g.Nodes {
+	size = len(g.Name())
+	for elem := range g.nodes {
 		size += elem.Size()
 	}
 	return size
@@ -45,25 +80,25 @@ func (g *Graph) Size() int {
 
 // AddNode to a graph.
 func (g *Graph) AddNode(n *Node) {
-	_, found := g.Nodes[n]
-	g.Nodes[n] = true
+	_, found := g.nodes[n]
+	g.nodes[n] = true
 	if !found {
-		g.Modified = time.Now()
+		g.modified = time.Now()
 	}
 }
 
 // DeleteNode from a graph
 func (g *Graph) DeleteNode(n *Node) {
-	_, found := g.Nodes[n]
-	delete(g.Nodes, n)
+	_, found := g.nodes[n]
+	delete(g.nodes, n)
 	if found {
-		g.Modified = time.Now()
+		g.modified = time.Now()
 	}
 }
 
 // CountNodes returns the total number of nodes in the graph
 func (g *Graph) CountNodes() int {
-	return len(g.Nodes)
+	return len(g.nodes)
 }
 
 // GetNode tries to find a node based on an ID.
@@ -73,7 +108,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 		return nil, err
 	}
 
-	for elem := range g.Nodes {
+	for elem := range g.nodes {
 		if elem.ID() == uid {
 			return elem, nil
 		}
@@ -103,10 +138,10 @@ func FromYaml(y string) (g *Graph, e error) {
 // NewGraph creates a brand new graph
 func NewGraph(name string) *Graph {
 	return &Graph{
-		Created:  time.Now(),
-		ID:       uuid.NewV4(),
-		Name:     name,
-		Nodes:    make(map[*Node]bool),
-		Modified: time.Now(),
+		created:  time.Now(),
+		iD:       uuid.NewV4(),
+		name:     name,
+		nodes:    make(map[*Node]bool),
+		modified: time.Now(),
 	}
 }

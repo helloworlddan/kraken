@@ -36,7 +36,7 @@ func (e *Engine) GetGraph(id string) (g *Graph, err error) {
 	}
 
 	for elem := range e.Graphs {
-		if elem.ID == uid {
+		if elem.ID() == uid {
 			return elem, nil
 		}
 	}
@@ -46,7 +46,7 @@ func (e *Engine) GetGraph(id string) (g *Graph, err error) {
 // FindGraph tries to find a Graph by its name.
 func (e *Engine) FindGraph(name string) (g *Graph, err error) {
 	for elem := range e.Graphs {
-		if elem.Name == name {
+		if elem.Name() == name {
 			return elem, nil
 		}
 	}
@@ -95,7 +95,7 @@ func (e *Engine) LoadDirectory(path string) error {
 
 // DeleteFromDisk deletes the database store from disk.
 func (e *Engine) DeleteFromDisk(g *Graph) {
-	fileName := g.Name + C.FileSuffix()
+	fileName := g.Name() + C.FileSuffix()
 	os.Remove(fileName)
 }
 
@@ -111,8 +111,8 @@ func (e *Engine) WriteAllToDisk() (numGraps int, er error) {
 
 // WriteToDisk writes the content of this graph to disk.
 func (e *Engine) WriteToDisk(g *Graph) error {
-	g.Saved = time.Now()
-	fileName := g.Name + C.FileSuffix()
+	g.JustSaved()
+	fileName := g.Name() + C.FileSuffix()
 
 	y, err := g.ToYaml()
 	if err != nil {
