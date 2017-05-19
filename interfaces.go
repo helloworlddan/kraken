@@ -14,3 +14,5 @@ type YamlSerializable interface {
 type Sizable interface {
 	Size()
 }
+
+// TODO: Interface REST-Api Items

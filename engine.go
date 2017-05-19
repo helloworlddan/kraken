@@ -23,7 +23,7 @@ type Engine struct {
 func (e *Engine) Inspect() {
 	fmt.Printf("ID:\t\t%s\n", e.ID)
 	fmt.Printf("Type:\t\tEngine\n")
-	fmt.Printf("Started:\t%s\n", e.Started.Format(C.TimeFormat))
+	fmt.Printf("Started:\t%s\n", e.Started.Format(C.TimeFormat()))
 	fmt.Printf("Graphs:\t\t%d\n", e.CountGraphs())
 	fmt.Printf("\n")
 }
@@ -81,8 +81,8 @@ func (e *Engine) CountGraphs() int {
 func (e *Engine) LoadDirectory(path string) error {
 	files, _ := ioutil.ReadDir(path)
 	for _, f := range files {
-		if strings.HasSuffix(f.Name(), C.FileSuffix) {
-			name := strings.TrimSuffix(f.Name(), C.FileSuffix)
+		if strings.HasSuffix(f.Name(), C.FileSuffix()) {
+			name := strings.TrimSuffix(f.Name(), C.FileSuffix())
 			g, err := e.ReadFromDisk(name)
 			if err != nil {
 				return nil
@@ -95,7 +95,7 @@ func (e *Engine) LoadDirectory(path string) error {
 
 // DeleteFromDisk deletes the database store from disk.
 func (e *Engine) DeleteFromDisk(g *Graph) {
-	fileName := g.Name + C.FileSuffix
+	fileName := g.Name + C.FileSuffix()
 	os.Remove(fileName)
 }
 
@@ -112,7 +112,7 @@ func (e *Engine) WriteAllToDisk() (numGraps int, er error) {
 // WriteToDisk writes the content of this graph to disk.
 func (e *Engine) WriteToDisk(g *Graph) error {
 	g.Saved = time.Now()
-	fileName := g.Name + C.FileSuffix
+	fileName := g.Name + C.FileSuffix()
 
 	y, err := g.ToYaml()
 	if err != nil {
@@ -130,7 +130,7 @@ func (e *Engine) WriteToDisk(g *Graph) error {
 // ReadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
 func (e *Engine) ReadFromDisk(name string) (g *Graph, er error) {
-	fileName := name + C.FileSuffix
+	fileName := name + C.FileSuffix()
 
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
