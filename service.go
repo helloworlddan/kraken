@@ -20,7 +20,7 @@ var C *Configuration
 var E *Engine
 
 //Start the service.
-func Start() {
+func Start(blocking bool) {
 	shutdown := false
 	// TODO: Load from disk if available
 	C = DefaultConfiguration()
@@ -43,9 +43,11 @@ func Start() {
 	log.Println("Boot completed.")
 
 	listenOnShutDownEvent(&shutdown)
-	for {
-		// Boot complete sleep forever.
-		time.Sleep(time.Hour * 1000)
+	if blocking {
+		for {
+			// Boot complete sleep forever.
+			time.Sleep(time.Hour * 1000)
+		}
 	}
 }
 
