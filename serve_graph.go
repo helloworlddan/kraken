@@ -41,7 +41,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		g := NewGraph(name)
 		E.AddGraph(g)
-		y, err := g.ToYaml()
+		y, err := g.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
 			return
