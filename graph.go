@@ -1,6 +1,7 @@
 package kraken
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -17,7 +18,7 @@ type Graph struct {
 	Created  time.Time
 	Modified time.Time
 	Saved    time.Time
-	nodes    []*Node
+	Nodes    []*Node
 }
 
 // Inspect this graph.
@@ -37,7 +38,7 @@ func (g *Graph) Inspect() {
 func (g *Graph) Size() int {
 	size := int(unsafe.Sizeof(g.ID))
 	size = len(g.Name)
-	for _, elem := range g.nodes {
+	for _, elem := range g.Nodes {
 		size += elem.Size()
 	}
 	return size
@@ -46,13 +47,13 @@ func (g *Graph) Size() int {
 // AddNode to a graph.
 func (g *Graph) AddNode(n *Node) {
 	index := -1
-	for i, elem := range g.nodes {
+	for i, elem := range g.Nodes {
 		if n == elem {
 			index = i
 		}
 	}
 	if index == -1 {
-		g.nodes = append(g.nodes, n)
+		g.Nodes = append(g.Nodes, n)
 		g.Modified = time.Now()
 	}
 }
@@ -60,20 +61,20 @@ func (g *Graph) AddNode(n *Node) {
 // DeleteNode from a graph
 func (g *Graph) DeleteNode(n *Node) {
 	index := -1
-	for i, elem := range g.nodes {
+	for i, elem := range g.Nodes {
 		if n == elem {
 			index = i
 		}
 	}
 	if index > -1 {
-		g.nodes = append(g.nodes[:index], g.nodes[index+1:]...)
+		g.Nodes = append(g.Nodes[:index], g.Nodes[index+1:]...)
 		g.Modified = time.Now()
 	}
 }
 
 // CountNodes returns the total number of nodes in the graph
 func (g *Graph) CountNodes() int {
-	return len(g.nodes)
+	return len(g.Nodes)
 }
 
 // GetNode tries to find a node based on an ID.
@@ -83,7 +84,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 		return nil, err
 	}
 
-	for _, elem := range g.nodes {
+	for _, elem := range g.Nodes {
 		if elem.ID == uid {
 			return elem, nil
 		}
@@ -110,13 +111,22 @@ func FromYaml(y string) (g *Graph, e error) {
 	return &gra, nil
 }
 
+// ToJSON transforms the content of this Engine to yaml.
+func (g *Graph) ToJSON() (string, error) {
+	js, err := json.Marshal(g)
+	if err != nil {
+		return "", err
+	}
+	return string(js), nil
+}
+
 // NewGraph creates a brand new graph
 func NewGraph(name string) *Graph {
 	return &Graph{
 		Created:  time.Now(),
 		ID:       uuid.NewV4(),
 		Name:     name,
-		nodes:    make([]*Node, 0),
+		Nodes:    make([]*Node, 0),
 		Modified: time.Now(),
 	}
 }

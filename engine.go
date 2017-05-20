@@ -1,6 +1,7 @@
 package kraken
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -60,6 +61,15 @@ func (e *Engine) ToYaml() (y string, er error) {
 		return "", err
 	}
 	return string(yam), nil
+}
+
+// ToJSON transforms the content of this Engine to yaml.
+func (e *Engine) ToJSON() (string, error) {
+	js, err := json.Marshal(e)
+	if err != nil {
+		return "", err
+	}
+	return string(js), nil
 }
 
 // AddGraph to Engine.

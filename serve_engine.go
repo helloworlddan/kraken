@@ -3,7 +3,6 @@ package kraken
 import (
 	"io"
 	"net/http"
-
 )
 
 // ServeEngine hold calls to the Engine type
