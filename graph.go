@@ -17,7 +17,7 @@ type Graph struct {
 	created  time.Time
 	modified time.Time
 	saved    time.Time
-	nodes    map[*Node]bool
+	nodes    []*Node
 }
 
 // ID gets the id of this Graph
@@ -72,7 +72,7 @@ func (g *Graph) Inspect() {
 func (g *Graph) Size() int {
 	size := int(unsafe.Sizeof(g.ID))
 	size = len(g.Name())
-	for elem := range g.nodes {
+	for _, elem := range g.nodes {
 		size += elem.Size()
 	}
 	return size
@@ -80,18 +80,28 @@ func (g *Graph) Size() int {
 
 // AddNode to a graph.
 func (g *Graph) AddNode(n *Node) {
-	_, found := g.nodes[n]
-	g.nodes[n] = true
-	if !found {
+	index := -1
+	for i, elem := range g.nodes {
+		if n == elem {
+			index = i
+		}
+	}
+	if index == -1 {
+		g.nodes = append(g.nodes, n)
 		g.modified = time.Now()
 	}
 }
 
 // DeleteNode from a graph
 func (g *Graph) DeleteNode(n *Node) {
-	_, found := g.nodes[n]
-	delete(g.nodes, n)
-	if found {
+	index := -1
+	for i, elem := range g.nodes {
+		if n == elem {
+			index = i
+		}
+	}
+	if index > -1 {
+		g.nodes = append(g.nodes[:index], g.nodes[index+1:]...)
 		g.modified = time.Now()
 	}
 }
@@ -108,7 +118,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 		return nil, err
 	}
 
-	for elem := range g.nodes {
+	for _, elem := range g.nodes {
 		if elem.ID() == uid {
 			return elem, nil
 		}
@@ -141,7 +151,7 @@ func NewGraph(name string) *Graph {
 		created:  time.Now(),
 		iD:       uuid.NewV4(),
 		name:     name,
-		nodes:    make(map[*Node]bool),
+		nodes:    make([]*Node, 0),
 		modified: time.Now(),
 	}
 }

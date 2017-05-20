@@ -16,7 +16,7 @@ import (
 type Engine struct {
 	ID      uuid.UUID
 	Started time.Time
-	Graphs  map[*Graph]bool
+	Graphs  []*Graph
 }
 
 // Inspect inspects this Engine.
@@ -35,7 +35,7 @@ func (e *Engine) GetGraph(id string) (g *Graph, err error) {
 		return nil, err
 	}
 
-	for elem := range e.Graphs {
+	for _, elem := range e.Graphs {
 		if elem.ID() == uid {
 			return elem, nil
 		}
@@ -45,7 +45,7 @@ func (e *Engine) GetGraph(id string) (g *Graph, err error) {
 
 // FindGraph tries to find a Graph by its name.
 func (e *Engine) FindGraph(name string) (g *Graph, err error) {
-	for elem := range e.Graphs {
+	for _, elem := range e.Graphs {
 		if elem.Name() == name {
 			return elem, nil
 		}
@@ -64,12 +64,28 @@ func (e *Engine) ToYaml() (y string, er error) {
 
 // AddGraph to Engine.
 func (e *Engine) AddGraph(g *Graph) {
-	e.Graphs[g] = true
+	index := -1
+	for i, elem := range e.Graphs {
+		if g == elem {
+			index = i
+		}
+	}
+	if index == -1 {
+		e.Graphs = append(e.Graphs, g)
+	}
 }
 
 // DropGraph from Engine.
 func (e *Engine) DropGraph(g *Graph) {
-	delete(e.Graphs, g)
+	index := -1
+	for i, elem := range e.Graphs {
+		if g == elem {
+			index = i
+		}
+	}
+	if index > -1 {
+		e.Graphs = append(e.Graphs[:index], e.Graphs[index+1:]...)
+	}
 }
 
 // CountGraphs counts the total number of all Graphs in this Engine.
@@ -101,7 +117,7 @@ func (e *Engine) DeleteFromDisk(g *Graph) {
 
 // WriteAllToDisk saves all Graphs associated with this Engine.
 func (e *Engine) WriteAllToDisk() (numGraps int, er error) {
-	for elem := range e.Graphs {
+	for _, elem := range e.Graphs {
 		if err := e.WriteToDisk(elem); err != nil {
 			return 0, err
 		}
@@ -149,7 +165,7 @@ func (e *Engine) ReadFromDisk(name string) (g *Graph, er error) {
 func NewEngine() *Engine {
 	return &Engine{
 		ID:      uuid.NewV4(),
-		Graphs:  make(map[*Graph]bool),
+		Graphs:  make([]*Graph, 0),
 		Started: time.Now(),
 	}
 }
