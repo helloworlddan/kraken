@@ -23,7 +23,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 				Respond(w, http.StatusNotFound)
 				return
 			}
-			uid = g.ID()
+			uid = g.ID
 		}
 		g, err := E.GetGraph(uid.String())
 		if err != nil {
@@ -56,7 +56,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 				Respond(w, http.StatusNotFound)
 				return
 			}
-			uid = g.ID()
+			uid = g.ID
 		}
 		g, err := E.GetGraph(uid.String())
 		if err != nil {

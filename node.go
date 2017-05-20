@@ -12,45 +12,20 @@ import (
 
 // Node in a graph.
 type Node struct {
-	iD       uuid.UUID
-	created  time.Time
-	modified time.Time
-	name     string
+	ID       uuid.UUID
+	Created  time.Time
+	Modified time.Time
+	Name     string
 	data     map[string]string
-}
-
-// ID gets the iD of this Node.
-func (n *Node) ID() uuid.UUID {
-	return n.iD
-}
-
-// Created gets the created of this Node.
-func (n *Node) Created() time.Time {
-	return n.created
-}
-
-// Modified gets the modified of this Node.
-func (n *Node) Modified() time.Time {
-	return n.modified
-}
-
-// Name gets the name of this Node.
-func (n *Node) Name() string {
-	return n.name
-}
-
-// JustModified sets the modification time to now.
-func (n *Node) JustModified() {
-	n.modified = time.Now()
 }
 
 // Inspect this node.
 func (n *Node) Inspect() {
-	fmt.Printf("ID:\t\t%s\n", n.ID())
+	fmt.Printf("ID:\t\t%s\n", n.ID)
 	fmt.Printf("Type:\t\tNode\n")
-	fmt.Printf("Name:\t\t%s\n", n.Name())
-	fmt.Printf("Created:\t%s\n", n.Created().Format(C.TimeFormat()))
-	fmt.Printf("Modified:\t%s\n", n.Modified().Format(C.TimeFormat()))
+	fmt.Printf("Name:\t\t%s\n", n.Name)
+	fmt.Printf("Created:\t%s\n", n.Created.Format(C.TimeFormat))
+	fmt.Printf("Modified:\t%s\n", n.Modified.Format(C.TimeFormat))
 	fmt.Printf("Size:\t\t%d\n", n.Size())
 	fmt.Printf("Data:\n")
 	for k, v := range n.data {
@@ -62,7 +37,7 @@ func (n *Node) Inspect() {
 // Size of this Node struct.
 func (n *Node) Size() int {
 	size := int(unsafe.Sizeof(n.ID))
-	size += len(n.Name())
+	size += len(n.Name)
 	for k, v := range n.data {
 		size += len(k)
 		size += len(v)
@@ -73,7 +48,7 @@ func (n *Node) Size() int {
 // PutData into a Node. Will always modify.
 func (n *Node) PutData(key string, value string) {
 	n.data[key] = value
-	n.JustModified()
+	n.Modified = time.Now()
 }
 
 // DropData from a Node. Do nothing if the item is not found.
@@ -81,7 +56,7 @@ func (n *Node) DropData(key string) {
 	for k := range n.data {
 		if k == key {
 			delete(n.data, key)
-			n.JustModified()
+			n.Modified = time.Now()
 		}
 	}
 }
@@ -113,10 +88,10 @@ func (n *Node) ToYaml() (y string, e error) {
 // NewNode creates a brand new node
 func NewNode(name string) *Node {
 	return &Node{
-		created:  time.Now(),
-		iD:       uuid.NewV4(),
-		name:     name,
+		Created:  time.Now(),
+		ID:       uuid.NewV4(),
+		Name:     name,
 		data:     make(map[string]string),
-		modified: time.Now(),
+		Modified: time.Now(),
 	}
 }

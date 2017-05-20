@@ -25,17 +25,17 @@ func Start() {
 	// TODO: Load from disk if available
 	C = DefaultConfiguration()
 
-	log.Println("Starting " + C.ApplicationName() + " Version " + C.ApplicationVersion())
+	log.Println("Starting " + C.ApplicationName + " Version " + C.ApplicationVersion)
 	E = NewEngine()
 	log.Println("Engine online.")
 
-	E.LoadDirectory(C.DefaultStore())
+	E.LoadDirectory(C.DefaultStore)
 	log.Println("Loaded " + strconv.Itoa(E.CountGraphs()) + " graph(s).")
 
 	go autoSave(&shutdown)
 	log.Println("Auto-Saving online.")
 
-	hostConfig := C.Host() + ":" + strconv.Itoa(C.Port())
+	hostConfig := C.Host + ":" + strconv.Itoa(C.Port)
 	log.Println("Booting HTTP-API at " + hostConfig)
 	go serve(hostConfig)
 	log.Println("HTTP-API online.")
@@ -62,7 +62,7 @@ func listenOnShutDownEvent(shutdown *bool) {
 }
 
 func serve(conf string) {
-	router := mux.NewRouter().StrictSlash(C.StrictSlashesInURLs())
+	router := mux.NewRouter().StrictSlash(C.StrictSlashesInURLs)
 	router.HandleFunc("/", ServeEngine)
 	router.HandleFunc("/{graph}/", ServeGraph)
 	router.HandleFunc("/{graph}/{node}/", ServeNode)
@@ -70,7 +70,7 @@ func serve(conf string) {
 }
 
 func autoSave(shutdown *bool) {
-	time.Sleep(C.AutoWriteInterval())
+	time.Sleep(C.AutoWriteInterval)
 	for {
 		num, err := E.WriteAllToDisk()
 		if err != nil {
@@ -81,6 +81,6 @@ func autoSave(shutdown *bool) {
 			// autosave should shutdown to avoid data loss
 			os.Exit(0)
 		}
-		time.Sleep(C.AutoWriteInterval())
+		time.Sleep(C.AutoWriteInterval)
 	}
 }
