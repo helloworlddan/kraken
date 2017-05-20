@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -118,6 +119,18 @@ func (g *Graph) ToJSON() (string, error) {
 		return "", err
 	}
 	return string(js), nil
+}
+
+// Serialize this Graph.
+func (g *Graph) Serialize() (string, error) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		return g.ToYaml()
+	case "JSON":
+		return g.ToJSON()
+	default:
+		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
+	}
 }
 
 // NewGraph creates a brand new graph

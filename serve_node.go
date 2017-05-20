@@ -38,7 +38,7 @@ func ServeNode(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		y, err := n.ToYaml()
+		y, err := n.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
 			return

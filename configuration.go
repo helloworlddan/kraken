@@ -13,6 +13,7 @@ type Configuration struct {
 	FileSuffix          string
 	AutoWriteInterval   time.Duration
 	StrictSlashesInURLs bool
+	OutputFormat        string
 }
 
 // DefaultConfiguration of the application.
@@ -27,5 +28,6 @@ func DefaultConfiguration() *Configuration {
 		FileSuffix:          ".kraken",
 		AutoWriteInterval:   time.Second * 10,
 		StrictSlashesInURLs: true,
+		OutputFormat:        "JSON",
 	}
 }

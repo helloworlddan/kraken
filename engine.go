@@ -72,6 +72,18 @@ func (e *Engine) ToJSON() (string, error) {
 	return string(js), nil
 }
 
+// Serialize this Engine.
+func (e *Engine) Serialize() (string, error) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		return e.ToYaml()
+	case "JSON":
+		return e.ToJSON()
+	default:
+		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
+	}
+}
+
 // AddGraph to Engine.
 func (e *Engine) AddGraph(g *Graph) {
 	index := -1

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 	"unsafe"
 
@@ -93,6 +94,18 @@ func (n *Node) ToJSON() (string, error) {
 		return "", err
 	}
 	return string(js), nil
+}
+
+// Serialize this Node.
+func (n *Node) Serialize() (string, error) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		return n.ToYaml()
+	case "JSON":
+		return n.ToJSON()
+	default:
+		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
+	}
 }
 
 // NewNode creates a brand new node

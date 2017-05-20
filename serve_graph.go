@@ -31,7 +31,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		y, err := g.ToYaml()
+		y, err := g.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
 			return

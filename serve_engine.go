@@ -10,7 +10,7 @@ func ServeEngine(w http.ResponseWriter, r *http.Request) {
 	LogRequest(r)
 	switch r.Method {
 	case "GET":
-		y, err := E.ToYaml()
+		y, err := E.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
 			return
