@@ -1,6 +1,14 @@
 package kraken
 
-import "time"
+import (
+	"io/ioutil"
+	"time"
+
+	yaml "gopkg.in/yaml.v2"
+)
+
+// ConfigurationPath default path to load configuration.
+const ConfigurationPath = "./config.yaml"
 
 // Configuration holds the entire config.
 type Configuration struct {
@@ -16,8 +24,30 @@ type Configuration struct {
 	OutputFormat        string
 }
 
-// DefaultConfiguration of the application.
-func DefaultConfiguration() *Configuration {
+func loadFromDisk() (*Configuration, error) {
+	data, err := ioutil.ReadFile(ConfigurationPath)
+	if err != nil {
+		return nil, err
+	}
+	var conf Configuration
+	err = yaml.Unmarshal([]byte(data), &conf)
+	if err != nil {
+		return nil, err
+	}
+
+	return &conf, nil
+}
+
+// UseConfiguration returns the currently valid configuration.
+func UseConfiguration() *Configuration {
+	conf, err := loadFromDisk()
+	if err != nil {
+		return defaultConfiguration()
+	}
+	return conf
+}
+
+func defaultConfiguration() *Configuration {
 	return &Configuration{
 		ApplicationName:     "Kraken",
 		ApplicationVersion:  "v0.0.1",

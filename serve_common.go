@@ -4,10 +4,19 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Respond to a web request
 func Respond(writer http.ResponseWriter, status int) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		writer.Header().Set("Content-Type", "application/yaml")
+	case "JSON":
+		writer.Header().Set("Content-Type", "application/json")
+	default:
+		writer.Header().Set("Content-Type", "text/plain")
+	}
 	writer.WriteHeader(status)
 	LogResponse(status)
 }

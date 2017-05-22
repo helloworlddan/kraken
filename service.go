@@ -22,8 +22,7 @@ var E *Engine
 //Start the service.
 func Start(blocking bool) {
 	shutdown := false
-	// TODO: Load from disk if available
-	C = DefaultConfiguration()
+	C = UseConfiguration()
 
 	log.Println("Starting " + C.ApplicationName + " Version " + C.ApplicationVersion)
 	E = NewEngine()
@@ -45,7 +44,7 @@ func Start(blocking bool) {
 	listenOnShutDownEvent(&shutdown)
 	if blocking {
 		for {
-			// Boot complete sleep forever.
+			// Boot complete, sleep forever.
 			time.Sleep(time.Hour * 1000)
 		}
 	}
