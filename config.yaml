@@ -5,6 +5,6 @@ host: localhost
 port: 8000
 defaultstore: ./
 filesuffix: .kraken
-autoWriteinterval: 10s
+autowriteinterval: 10s
 strictslashesinurls: true
 outputformat: JSON 
