@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"io/ioutil"
+	"log"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
@@ -29,13 +30,13 @@ func loadFromDisk() (*Configuration, error) {
 	if err != nil {
 		return nil, err
 	}
-	var conf Configuration
-	err = yaml.Unmarshal([]byte(data), &conf)
+	conf := defaultConfiguration()
+	err = yaml.Unmarshal([]byte(data), conf)
 	if err != nil {
 		return nil, err
 	}
-
-	return &conf, nil
+	log.Println("Loaded configuration from " + ConfigurationPath)
+	return conf, nil
 }
 
 // UseConfiguration returns the currently valid configuration.
@@ -58,6 +59,6 @@ func defaultConfiguration() *Configuration {
 		FileSuffix:          ".kraken",
 		AutoWriteInterval:   time.Second * 10,
 		StrictSlashesInURLs: true,
-		OutputFormat:        "JSON",
+		OutputFormat:        "YAML",
 	}
 }
