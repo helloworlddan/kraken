@@ -45,6 +45,11 @@ func ServeNode(w http.ResponseWriter, r *http.Request) {
 		}
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
+		return
+	case "DELETE":
+		g.DeleteNode(n)
+		Respond(w, http.StatusOK)
+		return
 	default:
 		Respond(w, http.StatusMethodNotAllowed)
 		return

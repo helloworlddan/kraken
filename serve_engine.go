@@ -17,6 +17,18 @@ func ServeEngine(w http.ResponseWriter, r *http.Request) {
 		}
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
+		return
+	case "POST":
+		g := NewGraph("")
+		E.AddGraph(g)
+		y, err := g.Serialize()
+		if err != nil {
+			Respond(w, http.StatusInternalServerError)
+			return
+		}
+		Respond(w, http.StatusOK)
+		io.WriteString(w, y)
+		return
 	default:
 		Respond(w, http.StatusMethodNotAllowed)
 		return
