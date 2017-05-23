@@ -111,13 +111,15 @@ func (n *Node) ToXML() (string, error) {
 }
 
 // MarshalXML marshalls the data map to XML
-func (d *Data) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	tokens := []xml.Token{start}
 
-	for key, value := range d.Map {
-		t := xml.StartElement{Name: xml.Name{Space: "", Local: key}}
-		tokens = append(tokens, t, xml.CharData(value), xml.EndElement{Name: t.Name})
-	}
+	tokens = append(tokens, xml.StartElement{Name: xml.Name{Space: "", Local: "ID"}}, xml.CharData(n.ID.String()), xml.EndElement{Name: xml.Name{Space: "", Local: "ID"}})
+
+	//	for key, value := range d.Map {
+	//		t := xml.StartElement{Name: xml.Name{Space: "", Local: key}}
+	//		tokens = append(tokens, t, xml.CharData(value), xml.EndElement{Name: t.Name})
+	//	}
 
 	tokens = append(tokens, xml.EndElement{Name: start.Name})
 
