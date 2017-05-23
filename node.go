@@ -19,11 +19,7 @@ type Node struct {
 	Created  time.Time
 	Modified time.Time
 	Name     string
-	Data     Data
-}
-
-type Data struct {
-	Map map[string]string
+	Data     map[string]string
 }
 
 // Inspect this node.
@@ -35,7 +31,7 @@ func (n *Node) Inspect() {
 	fmt.Printf("Modified:\t%s\n", n.Modified.Format(C.TimeFormat))
 	fmt.Printf("Size:\t\t%d\n", n.Size())
 	fmt.Printf("Data:\n")
-	for k, v := range n.Data.Map {
+	for k, v := range n.Data {
 		fmt.Printf("\t%s => %s\n", k, v)
 	}
 	fmt.Printf("\n")
@@ -45,7 +41,7 @@ func (n *Node) Inspect() {
 func (n *Node) Size() int {
 	size := int(unsafe.Sizeof(n.ID))
 	size += len(n.Name)
-	for k, v := range n.Data.Map {
+	for k, v := range n.Data {
 		size += len(k)
 		size += len(v)
 	}
@@ -54,15 +50,15 @@ func (n *Node) Size() int {
 
 // PutData into a Node. Will always modify.
 func (n *Node) PutData(key string, value string) {
-	n.Data.Map[key] = value
+	n.Data[key] = value
 	n.Modified = time.Now()
 }
 
 // DropData from a Node. Do nothing if the item is not found.
 func (n *Node) DropData(key string) {
-	for k := range n.Data.Map {
+	for k := range n.Data {
 		if k == key {
-			delete(n.Data.Map, key)
+			delete(n.Data, key)
 			n.Modified = time.Now()
 		}
 	}
@@ -70,12 +66,12 @@ func (n *Node) DropData(key string) {
 
 // CountData returns the total number of data items in a Node.
 func (n *Node) CountData() int {
-	return len(n.Data.Map)
+	return len(n.Data)
 }
 
 // FindData tries to find a data item based on its key.
 func (n *Node) FindData(key string) (string, error) {
-	for k, v := range n.Data.Map {
+	for k, v := range n.Data {
 		if k == key {
 			return v, nil
 		}
@@ -110,16 +106,34 @@ func (n *Node) ToXML() (string, error) {
 	return string(x), nil
 }
 
-// MarshalXML marshalls the data map to XML
+// MarshalXML marshalls the node to XML
 func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	tokens := []xml.Token{start}
 
-	tokens = append(tokens, xml.StartElement{Name: xml.Name{Space: "", Local: "ID"}}, xml.CharData(n.ID.String()), xml.EndElement{Name: xml.Name{Space: "", Local: "ID"}})
+	tokens = append(tokens,
+		xml.StartElement{Name: xml.Name{Space: "", Local: "ID"}},
+		xml.CharData(n.ID.String()),
+		xml.EndElement{Name: xml.Name{Space: "", Local: "ID"}})
 
-	//	for key, value := range d.Map {
-	//		t := xml.StartElement{Name: xml.Name{Space: "", Local: key}}
-	//		tokens = append(tokens, t, xml.CharData(value), xml.EndElement{Name: t.Name})
-	//	}
+	tokens = append(tokens,
+		xml.StartElement{Name: xml.Name{Space: "", Local: "Created"}},
+		xml.CharData(n.Created.Format(C.TimeFormat)),
+		xml.EndElement{Name: xml.Name{Space: "", Local: "Created"}})
+
+	tokens = append(tokens,
+		xml.StartElement{Name: xml.Name{Space: "", Local: "Modified"}},
+		xml.CharData(n.Modified.Format(C.TimeFormat)),
+		xml.EndElement{Name: xml.Name{Space: "", Local: "Modified"}})
+
+	tokens = append(tokens,
+		xml.StartElement{Name: xml.Name{Space: "", Local: "Name"}},
+		xml.CharData(n.Name),
+		xml.EndElement{Name: xml.Name{Space: "", Local: "Name"}})
+
+	for key, value := range n.Data {
+		t := xml.StartElement{Name: xml.Name{Space: "", Local: key}}
+		tokens = append(tokens, t, xml.CharData(value), xml.EndElement{Name: t.Name})
+	}
 
 	tokens = append(tokens, xml.EndElement{Name: start.Name})
 
@@ -158,7 +172,7 @@ func NewNode(name string) *Node {
 		Created:  time.Now(),
 		ID:       uuid.NewV4(),
 		Name:     name,
-		Data:     Data{Map: make(map[string]string)},
+		Data:     make(map[string]string),
 		Modified: time.Now(),
 	}
 }
