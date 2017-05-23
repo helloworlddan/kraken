@@ -80,7 +80,7 @@ func (g *Graph) CountNodes() int {
 }
 
 // GetNode tries to find a node based on an ID.
-func (g *Graph) GetNode(id string) (n *Node, err error) {
+func (g *Graph) GetNode(id string) (*Node, error) {
 	uid, err := uuid.FromString(id)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 }
 
 // FromYaml recreates Graph from YAML
-func FromYaml(y string) (g *Graph, e error) {
+func FromYaml(y string) (*Graph, error) {
 	var gra Graph
 	err := yaml.Unmarshal([]byte(y), &gra)
 	if err != nil {
@@ -105,7 +105,7 @@ func FromYaml(y string) (g *Graph, e error) {
 }
 
 // ToYaml transforms the content of this graph to yaml.
-func (g *Graph) ToYaml() (y string, e error) {
+func (g *Graph) ToYaml() (string, error) {
 	yam, err := yaml.Marshal(g)
 	if err != nil {
 		return "", err

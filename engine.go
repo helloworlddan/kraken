@@ -31,7 +31,7 @@ func (e *Engine) Inspect() {
 }
 
 // GetGraph tries to find a Graph based on an ID.
-func (e *Engine) GetGraph(id string) (g *Graph, err error) {
+func (e *Engine) GetGraph(id string) (*Graph, error) {
 	uid, err := uuid.FromString(id)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (e *Engine) GetGraph(id string) (g *Graph, err error) {
 }
 
 // FindGraph tries to find a Graph by its name.
-func (e *Engine) FindGraph(name string) (g *Graph, err error) {
+func (e *Engine) FindGraph(name string) (*Graph, error) {
 	for _, elem := range e.Graphs {
 		if elem.Name == name {
 			return elem, nil
@@ -56,7 +56,7 @@ func (e *Engine) FindGraph(name string) (g *Graph, err error) {
 }
 
 // ToYaml transforms the content of this Engine to yaml.
-func (e *Engine) ToYaml() (y string, er error) {
+func (e *Engine) ToYaml() (string, error) {
 	yam, err := yaml.Marshal(e)
 	if err != nil {
 		return "", err
@@ -144,13 +144,13 @@ func (e *Engine) LoadDirectory(path string) error {
 }
 
 // DeleteFromDisk deletes the database store from disk.
-func (e *Engine) DeleteFromDisk(g *Graph) {
+func (e *Engine) DeleteFromDisk(*Graph) {
 	fileName := g.Name + C.FileSuffix
 	os.Remove(fileName)
 }
 
 // WriteAllToDisk saves all Graphs associated with this Engine.
-func (e *Engine) WriteAllToDisk() (numGraps int, er error) {
+func (e *Engine) WriteAllToDisk() (int, error) {
 	for _, elem := range e.Graphs {
 		if err := e.WriteToDisk(elem); err != nil {
 			return 0, err
@@ -179,7 +179,7 @@ func (e *Engine) WriteToDisk(g *Graph) error {
 
 // ReadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
-func (e *Engine) ReadFromDisk(name string) (g *Graph, er error) {
+func (e *Engine) ReadFromDisk(name string) (*Graph, error) {
 	fileName := name + C.FileSuffix
 
 	data, err := ioutil.ReadFile(fileName)

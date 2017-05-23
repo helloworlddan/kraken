@@ -74,7 +74,7 @@ func (n *Node) CountData() int {
 }
 
 // FindData tries to find a data item based on its key.
-func (n *Node) FindData(key string) (value string, err error) {
+func (n *Node) FindData(key string) (string, error) {
 	for k, v := range n.Data.Map {
 		if k == key {
 			return v, nil
@@ -84,7 +84,7 @@ func (n *Node) FindData(key string) (value string, err error) {
 }
 
 // ToYaml transforms the content of this Node to yaml.
-func (n *Node) ToYaml() (y string, e error) {
+func (n *Node) ToYaml() (string, error) {
 	yam, err := yaml.Marshal(n)
 	if err != nil {
 		return "", err
@@ -128,7 +128,6 @@ func (d *Data) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 
-	// flush to ensure tokens are written
 	err := e.Flush()
 	if err != nil {
 		return err
