@@ -144,7 +144,7 @@ func (e *Engine) LoadDirectory(path string) error {
 }
 
 // DeleteFromDisk deletes the database store from disk.
-func (e *Engine) DeleteFromDisk(*Graph) {
+func (e *Engine) DeleteFromDisk(g *Graph) {
 	fileName := g.Name + C.FileSuffix
 	os.Remove(fileName)
 }
