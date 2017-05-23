@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,6 +19,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		g, er := E.FindGraph(name)
 		if er != nil {
 			Respond(w, http.StatusNotFound)
+			log.Println(err)
 			return
 		}
 		uid = g.ID
@@ -25,6 +27,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 	g, err := E.GetGraph(uid.String())
 	if err != nil {
 		Respond(w, http.StatusNotFound)
+		log.Println(err)
 		return
 	}
 
@@ -33,6 +36,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		y, err := g.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		Respond(w, http.StatusOK)
@@ -44,6 +48,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		y, err := n.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		Respond(w, http.StatusOK)

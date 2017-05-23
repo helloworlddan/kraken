@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ func ServeEngine(w http.ResponseWriter, r *http.Request) {
 		y, err := E.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		Respond(w, http.StatusOK)
@@ -24,6 +26,7 @@ func ServeEngine(w http.ResponseWriter, r *http.Request) {
 		y, err := g.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		Respond(w, http.StatusOK)

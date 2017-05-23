@@ -1,6 +1,6 @@
 applicationname: Kraken
 applicationversion:  v0.0.1
-timeformat: 2006-01-02T15:04:05Z07:00
+timeformat: 2001-01-01T13:01:01Z02:00
 host: localhost
 port: 8000
 defaultstore: ./

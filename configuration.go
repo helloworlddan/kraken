@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 // ConfigurationPath default path to load configuration.

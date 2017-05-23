@@ -14,6 +14,8 @@ func Respond(writer http.ResponseWriter, status int) {
 		writer.Header().Set("Content-Type", "application/yaml")
 	case "JSON":
 		writer.Header().Set("Content-Type", "application/json")
+	case "XML":
+		writer.Header().Set("Content-Type", "application/xml")
 	default:
 		writer.Header().Set("Content-Type", "text/plain")
 	}

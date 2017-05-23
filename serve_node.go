@@ -2,10 +2,11 @@ package kraken
 
 import (
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 // ServeNode hold calls to the Node type
@@ -20,6 +21,7 @@ func ServeNode(w http.ResponseWriter, r *http.Request) {
 		g, er := E.FindGraph(name)
 		if er != nil {
 			Respond(w, http.StatusNotFound)
+			log.Println(err)
 			return
 		}
 		uid = g.ID
@@ -27,12 +29,14 @@ func ServeNode(w http.ResponseWriter, r *http.Request) {
 	g, err := E.GetGraph(uid.String())
 	if err != nil {
 		Respond(w, http.StatusNotFound)
+		log.Println(err)
 		return
 	}
 
 	n, err := g.GetNode(id)
 	if err != nil {
 		Respond(w, http.StatusNotFound)
+		log.Println(err)
 		return
 	}
 
@@ -41,6 +45,7 @@ func ServeNode(w http.ResponseWriter, r *http.Request) {
 		y, err := n.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
 			return
 		}
 		Respond(w, http.StatusOK)

@@ -15,6 +15,11 @@ type JSONSerializable interface {
 	ToJSON()
 }
 
+// XMLSerializable graph item.
+type XMLSerializable interface {
+	ToXML()
+}
+
 // Serializable graph item.
 type Serializable interface {
 	Serializable()

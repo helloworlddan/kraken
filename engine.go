@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -72,6 +73,15 @@ func (e *Engine) ToJSON() (string, error) {
 	return string(js), nil
 }
 
+// ToXML transforms the content of this Engine to xml.
+func (e *Engine) ToXML() (string, error) {
+	x, err := xml.Marshal(e)
+	if err != nil {
+		return "", err
+	}
+	return string(x), nil
+}
+
 // Serialize this Engine.
 func (e *Engine) Serialize() (string, error) {
 	switch strings.ToUpper(C.OutputFormat) {
@@ -79,6 +89,8 @@ func (e *Engine) Serialize() (string, error) {
 		return e.ToYaml()
 	case "JSON":
 		return e.ToJSON()
+	case "XML":
+		return e.ToXML()
 	default:
 		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
 	}

@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"strings"
@@ -93,15 +94,6 @@ func (g *Graph) GetNode(id string) (n *Node, err error) {
 	return nil, errors.New("node not found")
 }
 
-// ToYaml transforms the content of this graph to yaml.
-func (g *Graph) ToYaml() (y string, e error) {
-	yam, err := yaml.Marshal(g)
-	if err != nil {
-		return "", err
-	}
-	return string(yam), nil
-}
-
 // FromYaml recreates Graph from YAML
 func FromYaml(y string) (g *Graph, e error) {
 	var gra Graph
@@ -112,13 +104,31 @@ func FromYaml(y string) (g *Graph, e error) {
 	return &gra, nil
 }
 
-// ToJSON transforms the content of this Engine to yaml.
+// ToYaml transforms the content of this graph to yaml.
+func (g *Graph) ToYaml() (y string, e error) {
+	yam, err := yaml.Marshal(g)
+	if err != nil {
+		return "", err
+	}
+	return string(yam), nil
+}
+
+// ToJSON transforms the content of this Engine to json..
 func (g *Graph) ToJSON() (string, error) {
 	js, err := json.Marshal(g)
 	if err != nil {
 		return "", err
 	}
 	return string(js), nil
+}
+
+// ToXML transforms the content of this Engine to xml.
+func (g *Graph) ToXML() (string, error) {
+	x, err := xml.Marshal(g)
+	if err != nil {
+		return "", err
+	}
+	return string(x), nil
 }
 
 // Serialize this Graph.
@@ -128,6 +138,8 @@ func (g *Graph) Serialize() (string, error) {
 		return g.ToYaml()
 	case "JSON":
 		return g.ToJSON()
+	case "XML":
+		return g.ToXML()
 	default:
 		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
 	}
