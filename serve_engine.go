@@ -2,6 +2,7 @@ package kraken
 
 import (
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -19,6 +20,17 @@ func ServeEngine(w http.ResponseWriter, r *http.Request) {
 		}
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
+		return
+	case "PUT":
+		// Should not be used
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Println(err)
+			Respond(w, http.StatusInternalServerError)
+			return
+		}
+		Respond(w, http.StatusOK)
+		io.WriteString(w, string(body))
 		return
 	case "POST":
 		g := NewGraph("")
