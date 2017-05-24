@@ -79,6 +79,16 @@ func (n *Node) FindData(key string) (string, error) {
 	return "", errors.New("key not found")
 }
 
+// NodeFromYaml recreates Node from YAML
+func NodeFromYaml(y string) (*Node, error) {
+	var n Node
+	err := yaml.Unmarshal([]byte(y), &n)
+	if err != nil {
+		return nil, err
+	}
+	return &n, nil
+}
+
 // ToYaml transforms the content of this Node to yaml.
 func (n *Node) ToYaml() (string, error) {
 	yam, err := yaml.Marshal(n)
@@ -86,6 +96,16 @@ func (n *Node) ToYaml() (string, error) {
 		return "", err
 	}
 	return string(yam), nil
+}
+
+// NodeFromJSON recreates Node from JSON
+func NodeFromJSON(js string) (*Node, error) {
+	var n Node
+	err := json.Unmarshal([]byte(js), &n)
+	if err != nil {
+		return nil, err
+	}
+	return &n, nil
 }
 
 // ToJSON transforms the content of this Node to yaml.
@@ -97,7 +117,17 @@ func (n *Node) ToJSON() (string, error) {
 	return string(js), nil
 }
 
-// ToXML transforms the content of this Engine to xml.
+// NodeFromXML recreates Node from XML
+func NodeFromXML(x string) (*Node, error) {
+	var n Node
+	err := xml.Unmarshal([]byte(x), &n)
+	if err != nil {
+		return nil, err
+	}
+	return &n, nil
+}
+
+// ToXML transforms the content of this Engine to XML.
 func (n *Node) ToXML() (string, error) {
 	x, err := xml.Marshal(n)
 	if err != nil {
@@ -163,6 +193,20 @@ func (n *Node) Serialize() (string, error) {
 		return n.ToXML()
 	default:
 		return "", errors.New("Output format " + C.OutputFormat + " not recognized.")
+	}
+}
+
+// DeserializeNode a Node.
+func DeserializeNode(raw string) (*Node, error) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		return NodeFromYaml(raw)
+	case "JSON":
+		return NodeFromJSON(raw)
+	case "XML":
+		return NodeFromXML(raw)
+	default:
+		return nil, errors.New("Output format " + C.OutputFormat + " not recognized.")
 	}
 }
 
