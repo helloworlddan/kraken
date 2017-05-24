@@ -73,11 +73,16 @@ func serve(conf string) {
 func autoSave(shutdown *bool) {
 	time.Sleep(C.AutoWriteInterval)
 	for {
-		num, err := E.WriteAllToDisk()
+		numWritten, err := E.WriteAllToDisk()
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println("Wrote " + strconv.Itoa(num) + " graph(s) to disk.")
+		log.Println("Wrote " + strconv.Itoa(numWritten) + " graph(s) to disk.")
+		numDeleted, err := E.CleanupStaleDBFiles()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("Deleted " + strconv.Itoa(numDeleted) + " stale files from disk.")
 		if *shutdown {
 			// autosave should shutdown to avoid data loss
 			os.Exit(0)

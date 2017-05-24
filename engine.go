@@ -143,6 +143,32 @@ func (e *Engine) LoadDirectory(path string) error {
 	return nil
 }
 
+// CleanupStaleDBFiles deletes stales persistence files.
+func (e *Engine) CleanupStaleDBFiles() (int, error) {
+	deleted := 0
+	var last error
+	files, _ := ioutil.ReadDir(C.DefaultStore)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), C.FileSuffix) {
+			stale := true
+			for _, g := range e.Graphs {
+				if (g.ID.String() + C.FileSuffix) == f.Name() {
+					stale = false
+					break
+				}
+			}
+			if stale {
+				err := os.Remove(f.Name())
+				if err != nil {
+					last = err
+				}
+				deleted++
+			}
+		}
+	}
+	return deleted, last
+}
+
 // DeleteFromDisk deletes the database store from disk.
 func (e *Engine) DeleteFromDisk(g *Graph) {
 	fileName := g.Name + C.FileSuffix
@@ -162,7 +188,7 @@ func (e *Engine) WriteAllToDisk() (int, error) {
 // WriteToDisk writes the content of this graph to disk.
 func (e *Engine) WriteToDisk(g *Graph) error {
 	g.Saved = time.Now()
-	fileName := g.Name + C.FileSuffix
+	fileName := g.ID.String() + C.FileSuffix
 
 	y, err := g.ToYaml()
 	if err != nil {
@@ -179,8 +205,8 @@ func (e *Engine) WriteToDisk(g *Graph) error {
 
 // ReadFromDisk loads the graph from the disk.
 // Needs the name of the graph to load.
-func (e *Engine) ReadFromDisk(name string) (*Graph, error) {
-	fileName := name + C.FileSuffix
+func (e *Engine) ReadFromDisk(id string) (*Graph, error) {
+	fileName := id + C.FileSuffix
 
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
