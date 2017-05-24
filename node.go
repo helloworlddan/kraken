@@ -48,6 +48,13 @@ func (n *Node) Size() int {
 	return size
 }
 
+// Update this Node with another one.
+func (n *Node) Update(update *Node) {
+	n.Name = update.Name
+	n.Data = update.Data
+	n.Modified = time.Now()
+}
+
 // PutData into a Node. Will always modify.
 func (n *Node) PutData(key string, value string) {
 	n.Data[key] = value
