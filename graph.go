@@ -46,6 +46,13 @@ func (g *Graph) Size() int {
 	return size
 }
 
+// Update this Graph with another one.
+func (g *Graph) Update(update *Graph) {
+	g.Name = update.Name
+	g.Nodes = update.Nodes
+	g.Modified = time.Now()
+}
+
 // AddNode to a graph.
 func (g *Graph) AddNode(n *Node) {
 	index := -1
