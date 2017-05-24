@@ -187,7 +187,7 @@ func (e *Engine) ReadFromDisk(name string) (*Graph, error) {
 		return nil, err
 	}
 
-	gra, err := FromYaml(string(data))
+	gra, err := GraphFromYaml(string(data))
 	if err != nil {
 		return nil, err
 	}

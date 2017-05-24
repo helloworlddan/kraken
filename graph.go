@@ -94,8 +94,8 @@ func (g *Graph) GetNode(id string) (*Node, error) {
 	return nil, errors.New("node not found")
 }
 
-// FromYaml recreates Graph from YAML
-func FromYaml(y string) (*Graph, error) {
+// GraphFromYaml recreates Graph from YAML
+func GraphFromYaml(y string) (*Graph, error) {
 	var gra Graph
 	err := yaml.Unmarshal([]byte(y), &gra)
 	if err != nil {
@@ -113,6 +113,16 @@ func (g *Graph) ToYaml() (string, error) {
 	return string(yam), nil
 }
 
+// GraphFromJSON recreates Graph from JSON
+func GraphFromJSON(js string) (*Graph, error) {
+	var gra Graph
+	err := json.Unmarshal([]byte(js), &gra)
+	if err != nil {
+		return nil, err
+	}
+	return &gra, nil
+}
+
 // ToJSON transforms the content of this Engine to json..
 func (g *Graph) ToJSON() (string, error) {
 	js, err := json.Marshal(g)
@@ -122,6 +132,16 @@ func (g *Graph) ToJSON() (string, error) {
 	return string(js), nil
 }
 
+// GraphFromXML recreates Graph from XML
+func GraphFromXML(x string) (*Graph, error) {
+	var gra Graph
+	err := xml.Unmarshal([]byte(x), &gra)
+	if err != nil {
+		return nil, err
+	}
+	return &gra, nil
+}
+
 // ToXML transforms the content of this Engine to xml.
 func (g *Graph) ToXML() (string, error) {
 	x, err := xml.Marshal(g)
@@ -129,6 +149,20 @@ func (g *Graph) ToXML() (string, error) {
 		return "", err
 	}
 	return string(x), nil
+}
+
+// DeserializeGraph this Graph.
+func DeserializeGraph(raw string) (*Graph, error) {
+	switch strings.ToUpper(C.OutputFormat) {
+	case "YAML":
+		return GraphFromYaml(raw)
+	case "JSON":
+		return GraphFromJSON(raw)
+	case "XML":
+		return GraphFromXML(raw)
+	default:
+		return nil, errors.New("Input format " + C.OutputFormat + " not recognized.")
+	}
 }
 
 // Serialize this Graph.
