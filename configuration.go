@@ -59,6 +59,6 @@ func defaultConfiguration() *Configuration {
 		FileSuffix:          ".kraken",
 		AutoWriteInterval:   time.Second * 10,
 		StrictSlashesInURLs: true,
-		OutputFormat:        "YAML",
+		OutputFormat:        "JSON",
 	}
 }
