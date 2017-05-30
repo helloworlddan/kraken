@@ -51,11 +51,24 @@ func GetGraphBody(body io.ReadCloser) (update *Graph, status int, err error) {
 	return update, http.StatusOK, nil
 }
 
+// GetNodeBody delivers a Node from a Body context.
+func GetNodeBody(body io.ReadCloser) (update *Node, status int, err error) {
+	content, err := ioutil.ReadAll(body)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	update, err = DeserializeNode(string(content))
+	if err != nil {
+		return update, http.StatusBadRequest, err
+	}
+	return update, http.StatusOK, nil
+}
+
 // GetGraphURL delivers a graph from an URL context.
 func GetGraphURL(req *http.Request) (current *Graph, status int, err error) {
 	vars := mux.Vars(req)
-	name := vars["graph"]
-	uid, err := uuid.FromString(name)
+	graphID := vars["graph"]
+	uid, err := uuid.FromString(graphID)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -64,4 +77,19 @@ func GetGraphURL(req *http.Request) (current *Graph, status int, err error) {
 		return current, http.StatusNotFound, err
 	}
 	return current, http.StatusOK, nil
+}
+
+// GetNodeURL delivers a graph and a node from an URL context.
+func GetNodeURL(req *http.Request) (currentGraph *Graph, currentNode *Node, status int, err error) {
+	vars := mux.Vars(req)
+	nodeID := vars["node"]
+	currentGraph, status, err = GetGraphURL(req)
+	if err != nil {
+		return currentGraph, nil, status, err
+	}
+	currentNode, err = currentGraph.GetNode(nodeID)
+	if err != nil {
+		return currentGraph, currentNode, status, err
+	}
+	return currentGraph, currentNode, status, nil
 }

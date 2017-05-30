@@ -17,7 +17,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-	case "GET":
+	case "GET": // Get an existing Graph.
 		y, err := current.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
@@ -49,7 +49,7 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		Respond(w, http.StatusOK)
 		io.WriteString(w, out)
 		return
-	case "POST":
+	case "POST": // Post empty Node into Graph.
 		n := NewNode("")
 		current.AddNode(n)
 		y, err := n.Serialize()
@@ -60,6 +60,25 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		}
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
+		return
+	case "PUT": // Create a new Node with the specified body.
+		update, status, err := GetNodeBody(r.Body)
+		if err != nil {
+			Respond(w, status)
+			log.Println(err)
+			return
+		}
+		n := NewNode("")
+		n.Update(update)
+		current.AddNode(n)
+		out, err := n.Serialize()
+		if err != nil {
+			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		Respond(w, http.StatusOK)
+		io.WriteString(w, out)
 		return
 	default:
 		Respond(w, http.StatusMethodNotAllowed)
