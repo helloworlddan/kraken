@@ -4,36 +4,21 @@ import (
 	"io"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
-	"github.com/satori/go.uuid"
 )
 
 // ServeGraph hold calls to the Graph type
 func ServeGraph(w http.ResponseWriter, r *http.Request) {
 	LogRequest(r)
-	vars := mux.Vars(r)
-	name := vars["graph"]
-	uid, err := uuid.FromString(name)
+	current, status, err := GetGraphURL(r)
 	if err != nil {
-		g, er := E.FindGraph(name)
-		if er != nil {
-			Respond(w, http.StatusNotFound)
-			log.Println(err)
-			return
-		}
-		uid = g.ID
-	}
-	g, err := E.GetGraph(uid.String())
-	if err != nil {
-		Respond(w, http.StatusNotFound)
+		Respond(w, status)
 		log.Println(err)
 		return
 	}
 
 	switch r.Method {
 	case "GET":
-		y, err := g.Serialize()
+		y, err := current.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
 			log.Println(err)
@@ -42,9 +27,31 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
 		return
+	case "DELETE": // Delete an existing Graph.
+		E.DropGraph(current)
+		current = nil
+		Respond(w, http.StatusOK)
+		return
+	case "PATCH": // Update an existing Graph with specified body.
+		update, status, err := GetGraphBody(r.Body)
+		if err != nil {
+			Respond(w, status)
+			log.Println(err)
+			return
+		}
+		current.Update(update)
+		out, err := current.Serialize()
+		if err != nil {
+			Respond(w, http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+		Respond(w, http.StatusOK)
+		io.WriteString(w, out)
+		return
 	case "POST":
 		n := NewNode("")
-		g.AddNode(n)
+		current.AddNode(n)
 		y, err := n.Serialize()
 		if err != nil {
 			Respond(w, http.StatusInternalServerError)
@@ -53,11 +60,6 @@ func ServeGraph(w http.ResponseWriter, r *http.Request) {
 		}
 		Respond(w, http.StatusOK)
 		io.WriteString(w, y)
-		return
-	case "DELETE":
-		E.DeleteFromDisk(g)
-		E.DropGraph(g)
-		Respond(w, http.StatusOK)
 		return
 	default:
 		Respond(w, http.StatusMethodNotAllowed)
