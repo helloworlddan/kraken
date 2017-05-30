@@ -38,8 +38,8 @@ func (n *Node) Inspect() {
 }
 
 // Size of this Node struct.
-func (n *Node) Size() int {
-	size := int(unsafe.Sizeof(n.ID))
+func (n *Node) Size() (size int) {
+	size = int(unsafe.Sizeof(n.ID))
 	size += len(n.Name)
 	for k, v := range n.Data {
 		size += len(k)
@@ -72,79 +72,61 @@ func (n *Node) DropData(key string) {
 }
 
 // CountData returns the total number of data items in a Node.
-func (n *Node) CountData() int {
+func (n *Node) CountData() (num int) {
 	return len(n.Data)
 }
 
 // FindData tries to find a data item based on its key.
-func (n *Node) FindData(key string) (string, error) {
-	for k, v := range n.Data {
+func (n *Node) FindData(key string) (value string, err error) {
+	for k, value := range n.Data {
 		if k == key {
-			return v, nil
+			return value, err
 		}
 	}
 	return "", errors.New("key not found")
 }
 
 // NodeFromYaml recreates Node from YAML
-func NodeFromYaml(y string) (*Node, error) {
-	var n Node
-	err := yaml.Unmarshal([]byte(y), &n)
-	if err != nil {
-		return nil, err
-	}
-	return &n, nil
+func NodeFromYaml(y string) (n *Node, err error) {
+	n = NewNode("")
+	err = yaml.Unmarshal([]byte(y), n)
+	return n, err
 }
 
 // ToYaml transforms the content of this Node to yaml.
-func (n *Node) ToYaml() (string, error) {
+func (n *Node) ToYaml() (out string, err error) {
 	yam, err := yaml.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-	return string(yam), nil
+	return string(yam), err
 }
 
 // NodeFromJSON recreates Node from JSON
-func NodeFromJSON(js string) (*Node, error) {
-	var n Node
-	err := json.Unmarshal([]byte(js), &n)
-	if err != nil {
-		return nil, err
-	}
-	return &n, nil
+func NodeFromJSON(js string) (n *Node, err error) {
+	n = NewNode("")
+	err = json.Unmarshal([]byte(js), n)
+	return n, err
 }
 
 // ToJSON transforms the content of this Node to yaml.
-func (n *Node) ToJSON() (string, error) {
+func (n *Node) ToJSON() (out string, err error) {
 	js, err := json.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-	return string(js), nil
+	return string(js), err
 }
 
 // NodeFromXML recreates Node from XML
-func NodeFromXML(x string) (*Node, error) {
-	var n Node
-	err := xml.Unmarshal([]byte(x), &n)
-	if err != nil {
-		return nil, err
-	}
-	return &n, nil
+func NodeFromXML(x string) (n *Node, err error) {
+	n = NewNode("")
+	err = xml.Unmarshal([]byte(x), n)
+	return n, err
 }
 
 // ToXML transforms the content of this Engine to XML.
-func (n *Node) ToXML() (string, error) {
+func (n *Node) ToXML() (out string, err error) {
 	x, err := xml.Marshal(n)
-	if err != nil {
-		return "", err
-	}
-	return string(x), nil
+	return string(x), err
 }
 
 // MarshalXML marshalls the node to XML
-func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 	tokens := []xml.Token{start}
 
 	tokens = append(tokens,
@@ -175,22 +157,18 @@ func (n *Node) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	tokens = append(tokens, xml.EndElement{Name: start.Name})
 
 	for _, t := range tokens {
-		err := e.EncodeToken(t)
+		err = e.EncodeToken(t)
 		if err != nil {
 			return err
 		}
 	}
 
-	err := e.Flush()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = e.Flush()
+	return err
 }
 
 // Serialize this Node.
-func (n *Node) Serialize() (string, error) {
+func (n *Node) Serialize() (out string, err error) {
 	switch strings.ToUpper(C.OutputFormat) {
 	case "YAML":
 		return n.ToYaml()
@@ -204,7 +182,7 @@ func (n *Node) Serialize() (string, error) {
 }
 
 // DeserializeNode a Node.
-func DeserializeNode(raw string) (*Node, error) {
+func DeserializeNode(raw string) (n *Node, err error) {
 	switch strings.ToUpper(C.OutputFormat) {
 	case "YAML":
 		return NodeFromYaml(raw)

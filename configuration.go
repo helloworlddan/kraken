@@ -25,12 +25,12 @@ type Configuration struct {
 	OutputFormat        string
 }
 
-func loadFromDisk() (*Configuration, error) {
+func loadFromDisk() (conf *Configuration, err error) {
 	data, err := ioutil.ReadFile(ConfigurationPath)
 	if err != nil {
 		return nil, err
 	}
-	conf := defaultConfiguration()
+	conf = defaultConfiguration()
 	err = yaml.Unmarshal([]byte(data), conf)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func loadFromDisk() (*Configuration, error) {
 }
 
 // UseConfiguration returns the currently valid configuration.
-func UseConfiguration() *Configuration {
+func UseConfiguration() (conf *Configuration) {
 	conf, err := loadFromDisk()
 	if err != nil {
 		return defaultConfiguration()

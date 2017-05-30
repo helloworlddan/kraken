@@ -37,8 +37,8 @@ func (g *Graph) Inspect() {
 }
 
 // Size of this Graph struct.
-func (g *Graph) Size() int {
-	size := int(unsafe.Sizeof(g.ID))
+func (g *Graph) Size() (size int) {
+	size = int(unsafe.Sizeof(g.ID))
 	size = len(g.Name)
 	for _, elem := range g.Nodes {
 		size += elem.Size()
@@ -82,84 +82,66 @@ func (g *Graph) DeleteNode(n *Node) {
 }
 
 // CountNodes returns the total number of nodes in the graph
-func (g *Graph) CountNodes() int {
+func (g *Graph) CountNodes() (num int) {
 	return len(g.Nodes)
 }
 
 // GetNode tries to find a node based on an ID.
-func (g *Graph) GetNode(id string) (*Node, error) {
+func (g *Graph) GetNode(id string) (n *Node, err error) {
 	uid, err := uuid.FromString(id)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, elem := range g.Nodes {
-		if elem.ID == uid {
-			return elem, nil
+	for _, n = range g.Nodes {
+		if n.ID == uid {
+			return n, nil
 		}
 	}
 	return nil, errors.New("node not found")
 }
 
 // GraphFromYaml recreates Graph from YAML
-func GraphFromYaml(y string) (*Graph, error) {
-	var gra Graph
-	err := yaml.Unmarshal([]byte(y), &gra)
-	if err != nil {
-		return nil, err
-	}
-	return &gra, nil
+func GraphFromYaml(y string) (g *Graph, err error) {
+	g = NewGraph("")
+	err = yaml.Unmarshal([]byte(y), g)
+	return g, err
 }
 
 // ToYaml transforms the content of this graph to yaml.
-func (g *Graph) ToYaml() (string, error) {
+func (g *Graph) ToYaml() (out string, err error) {
 	yam, err := yaml.Marshal(g)
-	if err != nil {
-		return "", err
-	}
-	return string(yam), nil
+	return string(yam), err
 }
 
 // GraphFromJSON recreates Graph from JSON
-func GraphFromJSON(js string) (*Graph, error) {
-	var gra Graph
-	err := json.Unmarshal([]byte(js), &gra)
-	if err != nil {
-		return nil, err
-	}
-	return &gra, nil
+func GraphFromJSON(js string) (g *Graph, err error) {
+	g = NewGraph("")
+	err = json.Unmarshal([]byte(js), g)
+	return g, err
 }
 
 // ToJSON transforms the content of this Engine to json..
-func (g *Graph) ToJSON() (string, error) {
+func (g *Graph) ToJSON() (out string, err error) {
 	js, err := json.Marshal(g)
-	if err != nil {
-		return "", err
-	}
-	return string(js), nil
+	return string(js), err
 }
 
 // GraphFromXML recreates Graph from XML
-func GraphFromXML(x string) (*Graph, error) {
-	var gra Graph
-	err := xml.Unmarshal([]byte(x), &gra)
-	if err != nil {
-		return nil, err
-	}
-	return &gra, nil
+func GraphFromXML(x string) (g *Graph, err error) {
+	g = NewGraph("")
+	err = xml.Unmarshal([]byte(x), g)
+	return g, err
 }
 
 // ToXML transforms the content of this Engine to xml.
-func (g *Graph) ToXML() (string, error) {
+func (g *Graph) ToXML() (out string, err error) {
 	x, err := xml.Marshal(g)
-	if err != nil {
-		return "", err
-	}
-	return string(x), nil
+	return string(x), err
 }
 
 // DeserializeGraph this Graph.
-func DeserializeGraph(raw string) (*Graph, error) {
+func DeserializeGraph(raw string) (g *Graph, err error) {
 	switch strings.ToUpper(C.OutputFormat) {
 	case "YAML":
 		return GraphFromYaml(raw)
@@ -173,7 +155,7 @@ func DeserializeGraph(raw string) (*Graph, error) {
 }
 
 // Serialize this Graph.
-func (g *Graph) Serialize() (string, error) {
+func (g *Graph) Serialize() (out string, err error) {
 	switch strings.ToUpper(C.OutputFormat) {
 	case "YAML":
 		return g.ToYaml()
