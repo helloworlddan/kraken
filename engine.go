@@ -57,8 +57,6 @@ func (e *Engine) FindGraph(name string) (g *Graph, err error) {
 	return nil, errors.New("graph not found")
 }
 
-// TODO: OK what if i override these to include engine version & name?
-
 // ToYaml transforms the content of this Engine to yaml.
 func (e *Engine) ToYaml() (y string, err error) {
 	yam, err := yaml.Marshal(e)
