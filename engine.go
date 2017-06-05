@@ -17,6 +17,8 @@ import (
 // Engine holding all Graphs.
 type Engine struct {
 	ID      uuid.UUID
+	Name    string
+	Version string
 	Started time.Time
 	Graphs  []*Graph
 }
@@ -54,6 +56,8 @@ func (e *Engine) FindGraph(name string) (g *Graph, err error) {
 	}
 	return nil, errors.New("graph not found")
 }
+
+// TODO: OK what if i override these to include engine version & name?
 
 // ToYaml transforms the content of this Engine to yaml.
 func (e *Engine) ToYaml() (y string, err error) {
@@ -212,6 +216,8 @@ func (e *Engine) ReadFromDisk(id string) (g *Graph, err error) {
 func NewEngine() *Engine {
 	return &Engine{
 		ID:      uuid.NewV4(),
+		Name:    C.ApplicationName,
+		Version: C.ApplicationVersion,
 		Graphs:  make([]*Graph, 0),
 		Started: time.Now(),
 	}
