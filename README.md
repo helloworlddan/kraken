@@ -1,5 +1,5 @@
 # Kraken
 
-### REST-faced In-Memory Graph Engine
+### REST-faced In-Memory Simple Document Store
 
-Kraken aims to provide an In-Memory Graph Engine that can either be used by directly binding the golang package or by its self-published REST-Api.
+Kraken aims to provide a simple In-Memory Document Store that can either be used by directly binding the golang package or by its self-published REST-Api.
