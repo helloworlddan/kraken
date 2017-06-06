@@ -1,4 +1,4 @@
-package kraken
+package core
 
 import (
 	"io"

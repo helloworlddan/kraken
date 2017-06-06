@@ -1,4 +1,4 @@
-package kraken
+package core
 
 // Inspectable graph item.
 type Inspectable interface {
