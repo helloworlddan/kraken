@@ -62,9 +62,8 @@ func (c *Configuration) loadFromEnvironment() (err error) {
 		i, err := strconv.Atoi(key)
 		if err != nil {
 			return err
-		} else {
-			c.Port = i
 		}
+		c.Port = i
 	}
 	if key := os.Getenv("KRAKEN_DEFAULTSTORE"); key != "" {
 		c.DefaultStore = key
@@ -76,17 +75,15 @@ func (c *Configuration) loadFromEnvironment() (err error) {
 		dur, err := time.ParseDuration(key)
 		if err != nil {
 			return err
-		} else {
-			c.AutoWriteInterval = dur
 		}
+		c.AutoWriteInterval = dur
 	}
 	if key := os.Getenv("KRAKEN_STRICTSLASHESINURLS"); key != "" {
 		b, err := strconv.ParseBool(key)
 		if err != nil {
 			return err
-		} else {
-			c.StrictSlashesInURLs = b
 		}
+		c.StrictSlashesInURLs = b
 	}
 	if key := os.Getenv("KRAKEN_OUTPUTFORMAT"); key != "" {
 		c.OutputFormat = key

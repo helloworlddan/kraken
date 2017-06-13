@@ -57,6 +57,8 @@ func listenOnShutDownEvent(shutdown *bool) {
 		<-c
 		log.Println("Shutdown initiated. Waiting for processes to finish...")
 		*shutdown = true
+		// Maximum wait time for processes to finish
+		// Is 1000 hours a great idea?
 		time.Sleep(time.Hour * 1000)
 	}()
 	fmt.Println("Hit Ctrl-c to initiate shutdown.")
