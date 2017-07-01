@@ -1,0 +1,18 @@
+language: go
+install:
+- go get -u "github.com/satori/go.uuid"
+- go get -u "github.com/gorilla/mux"
+- go get -u "github.com/gorilla/mux"
+- go get -u "gopkg.in/yaml.v2"
+go:
+- master
+script:
+- go build -tags netgo
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: qRg3fGX2zysnDTU37ZXkENlJ87xtw+oNaEOA2B4Lz/g4tPlTup/TPzyYSn/oQ1DUbs9erlCHQJwQMWPlTfl8G+qHYYWLJQxgks3Z7ZV864bBoZdVPMt9GKDizmveGm7dVMBeb/cKS9EwvHLLprzhW/Dk104L9LjiaxFFXWaBvVTBpSC1exCV6Gy2g3RU5FhUsJUjsT44Aj/IJF2qvTqffkFaSqa+esUB5WDzJqtT78z01+iYMdMkv2TFjletXkJ73bjlE6K6Jl3uDf1q/LQ17wA2qC3sCZ95VNA46zVaCSWUfWaZWQjDA2I0O+t7NlpvoeFeE9XeLe/Kb6iKN9KMLMKixqyJ6QqVk2hfUtaQUK+C3mShXOnv8OG8Dfl41j+ZaX6ZzxiYsiT1DIDp4oemCw6abYP91L8SYSX1vqrphbVWKLAJf6lbuNUYvQcC6FxiELJekH8b1WxU1F9HH6+GQA07wIWaH0y/RyJ86C8yWCO5XxxCZ3WraLc3bgFSyfBlqOj6JEG9pX9Ocdg5kh8WEJ8T0ManPtNw7hsziQm2qc2E8nrvrqV7ULAVa3O0gtdJk0t0ibQKWNpa6OHylt2NIjLxbkLHOEyU5YeMluA9r4DxTdB0a7sacEieSrk//dvm9+8OGXBaPfF6wdZ61hOi+VhKUs+9HEnR/AsJZ2VBz6k=
+  file: kraken
+  on:
+    repo: planchao/kraken
